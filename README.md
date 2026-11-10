@@ -6,11 +6,16 @@ Permitirá validar tres actividades evaluativas, calcular una definitiva pondera
 
 ## Estado actual
 
-**Planificación y documentación inicial.** Todavía no hay aplicación, API, interfaz ni pruebas implementadas. No se han obtenido resultados de calidad o rendimiento. Los comandos de la guía describen la implementación prevista y aún no son ejecutables en este repositorio.
+**Backend inicial implementado.** Ya existen motor Decimal, validaciones, API FastAPI, documentación OpenAPI y 119 pruebas del frente de Jose. La verificación local registró 100 % de líneas y ramas del backend, Ruff aprobado y Bandit sin hallazgos. Esto no acredita la entrega completa: interfaz, packaging, pruebas independientes, CI y carga siguen pendientes.
+
+Las instrucciones temporales para ejecutar y probar la API están en [docs/backend.md](docs/backend.md). Los comandos de la guía que dependen de archivos todavía no implementados siguen siendo un plan, no resultados comprobados.
 
 ## Documentación
 
 - [Guía completa: requisitos, contrato, arquitectura, pruebas y plan de trabajo](SIGEN_Lite_Guia_Completa.md).
+- [Contrato de la API y acuerdos de integración](docs/contrato_api.md).
+- [Requisitos y alcance del backend](docs/requisitos.md).
+- [Ejecución, pruebas y pendientes del backend](docs/backend.md).
 
 ## Alcance inicial
 
@@ -30,4 +35,4 @@ Es un simulador con datos ficticios, sin cuentas, base de datos ni integración 
 | Santiago | Interfaz y accesibilidad |
 | Stefven | Pruebas independientes, configuración y evidencias |
 
-Antes de desarrollar, revisar el contrato común de la guía. La interfaz requiere maqueta y plan aprobados antes de implementarse. Los comandos de instalación y ejecución se incorporarán y verificarán al desarrollar la aplicación.
+Antes de desarrollar, revisar el contrato común de la guía y conservar la implementación existente. La interfaz requiere maqueta y plan aprobados antes de implementarse. Stefven preparará el paquete instalable, las dependencias fijadas y los comandos definitivos; mientras tanto, utilizar las instrucciones temporales del backend.
