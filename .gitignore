@@ -1,0 +1,39 @@
+# Entornos y cachés de Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+
+# Reportes generados; las evidencias seleccionadas irán en docs/evidencias/
+.coverage
+.coverage.*
+coverage.json
+coverage.xml
+htmlcov/
+locust_*.csv
+locust_*.html
+*.log
+
+# Secretos y configuración local
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.aws/
+
+# Archivos del editor y sistema
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Notas internas y configuración de herramientas de asistencia
+docs/plan-equipo/
+.agents/
+.codex/
