@@ -112,7 +112,7 @@ def main() -> int:
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     # Un reporte de una ejecución anterior nunca debe aprobar esta.
     REPORTE_JSON.unlink(missing_ok=True)
-    print("$ " + " ".join(COMANDO_PYTEST[1:]), flush=True)
+    print("$ python " + " ".join(COMANDO_PYTEST[1:]), flush=True)
     # Lista fija de argumentos, sin shell ni datos externos.
     resultado = subprocess.run(COMANDO_PYTEST, cwd=RAIZ, check=False)
     if resultado.returncode != 0:

@@ -14,7 +14,7 @@ index 7a30212..4ed895d 100644
          contexto.prec = PRECISION_CALCULO
 
 $ python scripts/verificar_calidad.py
-$ -m pytest --cov=sigen --cov-branch --cov-report=term-missing --cov-report=html --cov-report=json:coverage.json
+$ python -m pytest --cov=sigen --cov-branch --cov-report=term-missing --cov-report=html --cov-report=json:coverage.json
 ============================= test session starts =============================
 platform win32 -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0
 rootdir: <copia-aislada>
