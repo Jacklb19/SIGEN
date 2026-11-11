@@ -1,0 +1,47 @@
+# Fecha: 2026-11-11T04:47:32Z | Misma copia aislada tras corregir '<' por '<='
+$ git diff (vacío: el archivo vuelve a la versión de la rama)
+
+$ python scripts/verificar_calidad.py
+$ -m pytest --cov=sigen --cov-branch --cov-report=term-missing --cov-report=html --cov-report=json:coverage.json
+============================= test session starts =============================
+platform win32 -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0
+rootdir: <copia-aislada>
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.16.0, locust-2.47.0, cov-7.1.0
+collected 255 items
+
+tests\api\test_api.py .................................................. [ 19%]
+....................                                                     [ 27%]
+tests\calidad\test_verificar_calidad.py ..................               [ 34%]
+tests\contract\test_contrato_errores.py ................................ [ 47%]
+.................................                                        [ 60%]
+tests\contract\test_contrato_esquemas.py ....................            [ 67%]
+tests\contract\test_contrato_exito.py ...............................    [ 80%]
+tests\contract\test_contrato_fallo_interno.py ..                         [ 80%]
+tests\unit\test_calculator.py .......................................... [ 97%]
+.......                                                                  [100%]
+
+=============================== tests coverage ================================
+______________ coverage: platform win32, python 3.11.18-final-0 _______________
+
+Name                      Stmts   Miss Branch BrPart  Cover   Missing
+---------------------------------------------------------------------
+src\sigen\__init__.py         0      0      0      0   100%
+src\sigen\api.py             44      0      4      0   100%
+src\sigen\calculator.py      17      0      0      0   100%
+src\sigen\config.py          18      0      0      0   100%
+src\sigen\domain.py          31      0      0      0   100%
+src\sigen\schemas.py          5      0      0      0   100%
+src\sigen\validators.py      88      0     46      0   100%
+---------------------------------------------------------------------
+TOTAL                       203      0     50      0   100%
+Coverage HTML written to dir htmlcov
+Coverage JSON written to file coverage.json
+============================= 255 passed in 4.13s =============================
+
+=== Puerta de calidad ===
+Líneas: 203/203 (100.00%); mínimo exigido 80%.
+Ramas: 50/50 (100.00%); informativo, sin umbral acordado.
+APROBADO: suite en verde y cobertura de líneas suficiente.
+Código de salida: 0

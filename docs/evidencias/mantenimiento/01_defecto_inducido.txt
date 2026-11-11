@@ -1,0 +1,247 @@
+# Fecha: 2026-11-11T04:47:10Z | Copia aislada (git worktree, HEAD 9c382e7) con defecto inducido
+diff --git a/src/sigen/validators.py b/src/sigen/validators.py
+index 7a30212..4ed895d 100644
+--- a/src/sigen/validators.py
++++ b/src/sigen/validators.py
+@@ -46,7 +46,7 @@ def validar_nota(valor: object, ruta: str = "nota") -> Decimal:
+     if type(valor) not in (int, Decimal):
+         _fallar(ruta, "TIPO", "La nota debe ser un número.")
+     nota = Decimal(valor)
+-    if not nota.is_finite() or not NOTA_MIN <= nota <= NOTA_MAX:
++    if not nota.is_finite() or not NOTA_MIN <= nota < NOTA_MAX:
+         _fallar(ruta, "RANGO", "La nota debe estar entre 0 y 5 y ser finita.")
+     with localcontext() as contexto:
+         contexto.prec = PRECISION_CALCULO
+
+$ python scripts/verificar_calidad.py
+$ -m pytest --cov=sigen --cov-branch --cov-report=term-missing --cov-report=html --cov-report=json:coverage.json
+============================= test session starts =============================
+platform win32 -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0
+rootdir: <copia-aislada>
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.16.0, locust-2.47.0, cov-7.1.0
+collected 255 items
+
+tests\api\test_api.py .............F.................................... [ 19%]
+....................                                                     [ 27%]
+tests\calidad\test_verificar_calidad.py ..................               [ 34%]
+tests\contract\test_contrato_errores.py ................................ [ 47%]
+.................................                                        [ 60%]
+tests\contract\test_contrato_esquemas.py ....................            [ 67%]
+tests\contract\test_contrato_exito.py .........F.......F.............    [ 80%]
+tests\contract\test_contrato_fallo_interno.py ..                         [ 80%]
+tests\unit\test_calculator.py ...F................F..................... [ 97%]
+...F...                                                                  [100%]
+
+================================== FAILURES ===================================
+_______________________ test_notas_frontera_validas[5] ________________________
+
+cliente = <starlette.testclient.TestClient object at 0x000002437E0A9C10>
+datos = {'actividades': [{'nombre': 'Parcial 1', 'nota': 5, 'peso': 30}, {'nombre': 'Parcial 2', 'nota': 2.5, 'peso': 30}, {'nombre': 'Proyecto', 'nota': 4.0, 'peso': 40}]}
+nota = 5
+
+    @pytest.mark.parametrize("nota", [0, 0.1, 4.9, 5])
+    def test_notas_frontera_validas(cliente, datos, nota):
+        datos["actividades"][0]["nota"] = nota
+>       assert cliente.post(RUTA, json=datos).status_code == 200
+E       AssertionError: assert 422 == 200
+E        +  where 422 = <Response [422 Unprocessable Content]>.status_code
+E        +    where <Response [422 Unprocessable Content]> = post('/api/v1/calcular', json={'actividades': [{'nombre': 'Parcial 1', 'nota': 5, 'peso': 30}, {'nombre': 'Parcial 2', 'nota': 2.5, 'peso': 30}, {'nombre': 'Proyecto', 'nota': 4.0, 'peso': 40}]})
+E        +      where post = <starlette.testclient.TestClient object at 0x000002437E0A9C10>.post
+
+tests\api\test_api.py:88: AssertionError
+_______________ test_tp08_tp09_umbral_de_aprobacion[maximo-5.0] _______________
+
+cliente = <starlette.testclient.TestClient object at 0x000002437E2AA550>
+notas = (5.0, 5.0, 5.0), definitiva = '5.0', estado = 'APROBADO'
+
+    @pytest.mark.parametrize(
+        ("notas", "definitiva", "estado"),
+        [
+            pytest.param((2.9, 2.9, 2.9), "2.9", "REPROBADO", id="TP-08-definitiva-2.9"),
+            pytest.param((3.0, 3.0, 3.0), "3.0", "APROBADO", id="TP-09-definitiva-3.0"),
+            pytest.param((0.0, 0.0, 0.0), "0.0", "REPROBADO", id="minimo-0.0"),
+            pytest.param((5.0, 5.0, 5.0), "5.0", "APROBADO", id="maximo-5.0"),
+        ],
+    )
+    def test_tp08_tp09_umbral_de_aprobacion(cliente, notas, definitiva, estado):
+>       cuerpo = calcular(cliente, peticion(notas=notas))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\contract\test_contrato_exito.py:100: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\contract\test_contrato_exito.py:24: in calcular
+    return comprobar_json(cliente.post(RUTA_CALCULO, json=datos), 200, "resultado")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+respuesta = <Response [422 Unprocessable Content]>, status = 200
+esquema = 'resultado'
+
+    def comprobar_json(respuesta, status: int, esquema: str):
+        """Estado, Content-Type JSON y validez frente al esquema indicado."""
+>       assert respuesta.status_code == status, respuesta.text
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: {"error":{"codigo":"VALIDACION","mensaje":"Revisa los datos.","campos":[{"ruta":"actividades.0.nota","codigo":"RANGO","mensaje":"La nota debe estar entre 0 y 5 y ser finita."},{"ruta":"actividades.1.nota","codigo":"RANGO","mensaje":"La nota debe estar entre 0 y 5 y ser finita."},{"ruta":"actividades.2.nota","codigo":"RANGO","mensaje":"La nota debe estar entre 0 y 5 y ser finita."}]}}
+
+tests\contract\ayudas_http.py:26: AssertionError
+_____________________ test_notas_frontera_validas[TP-04] ______________________
+
+cliente = <starlette.testclient.TestClient object at 0x000002437E2AA550>
+nota = 5.0
+
+    @pytest.mark.parametrize(
+        "nota", [0.0, 0.1, 4.9, 5.0], ids=["TP-01", "TP-02", "TP-05", "TP-04"]
+    )
+    def test_notas_frontera_validas(cliente, nota):
+>       calcular(cliente, peticion(notas=(nota, 2.5, 4.0)))
+
+tests\contract\test_contrato_exito.py:132: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\contract\test_contrato_exito.py:24: in calcular
+    return comprobar_json(cliente.post(RUTA_CALCULO, json=datos), 200, "resultado")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+respuesta = <Response [422 Unprocessable Content]>, status = 200
+esquema = 'resultado'
+
+    def comprobar_json(respuesta, status: int, esquema: str):
+        """Estado, Content-Type JSON y validez frente al esquema indicado."""
+>       assert respuesta.status_code == status, respuesta.text
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: {"error":{"codigo":"VALIDACION","mensaje":"Revisa los datos.","campos":[{"ruta":"actividades.0.nota","codigo":"RANGO","mensaje":"La nota debe estar entre 0 y 5 y ser finita."}]}}
+
+tests\contract\ayudas_http.py:26: AssertionError
+____________________________ test_notas_validas[5] ____________________________
+
+nota = '5'
+
+    @pytest.mark.parametrize("nota", ["0", "0.1", "4.9", "5", "3.50", "35e-1"])
+    def test_notas_validas(nota):
+>       assert validar_nota(Decimal(nota)) == Decimal(nota)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\unit\test_calculator.py:28: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src\sigen\validators.py:50: in validar_nota
+    _fallar(ruta, "RANGO", "La nota debe estar entre 0 y 5 y ser finita.")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+ruta = 'nota', codigo = 'RANGO'
+mensaje = 'La nota debe estar entre 0 y 5 y ser finita.'
+
+    def _fallar(ruta: str, codigo: str, mensaje: str) -> None:
+>       raise DatosInvalidos([ErrorCampo(ruta, codigo, mensaje)])
+E       sigen.domain.DatosInvalidos: Revisa los datos.
+
+src\sigen\validators.py:26: DatosInvalidos
+____________________________ test_notas_enteras[5] ____________________________
+
+nota = 5
+
+    @pytest.mark.parametrize("nota", [0, 3, 5])
+    def test_notas_enteras(nota):
+>       assert validar_nota(nota) == Decimal(nota)
+               ^^^^^^^^^^^^^^^^^^
+
+tests\unit\test_calculator.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src\sigen\validators.py:50: in validar_nota
+    _fallar(ruta, "RANGO", "La nota debe estar entre 0 y 5 y ser finita.")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+ruta = 'nota', codigo = 'RANGO'
+mensaje = 'La nota debe estar entre 0 y 5 y ser finita.'
+
+    def _fallar(ruta: str, codigo: str, mensaje: str) -> None:
+>       raise DatosInvalidos([ErrorCampo(ruta, codigo, mensaje)])
+E       sigen.domain.DatosInvalidos: Revisa los datos.
+
+src\sigen\validators.py:26: DatosInvalidos
+____________________ test_extremos_del_calculo[5-APROBADO] ____________________
+
+nota = '5', estado = <Estado.APROBADO: 'APROBADO'>
+
+    @pytest.mark.parametrize(
+        "nota,estado", [("0", Estado.REPROBADO), ("5", Estado.APROBADO)]
+    )
+    def test_extremos_del_calculo(nota, estado):
+>       resultado = calcular_resultado(entrada((nota, nota, nota), (100, 0, 0)))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\unit\test_calculator.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src\sigen\calculator.py:35: in calcular_resultado
+    actividades = validar_entrada(datos)
+                  ^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+datos = {'actividades': [{'nombre': 'Actividad 1', 'nota': Decimal('5'), 'peso': 100}, {'nombre': 'Actividad 2', 'nota': Decimal('5'), 'peso': 0}, {'nombre': 'Actividad 3', 'nota': Decimal('5'), 'peso': 0}]}
+
+    def validar_entrada(datos: object) -> tuple[Actividad, ...]:
+        if not isinstance(datos, dict):
+            _fallar("body", "TIPO", "La petición debe ser un objeto JSON.")
+        errores = _validar_claves(datos, {"actividades"}, "")
+        actividades = datos.get("actividades")
+        if "actividades" not in datos:
+            raise DatosInvalidos(errores)
+        if not isinstance(actividades, list):
+            errores.append(ErrorCampo("actividades", "TIPO", "Se requiere una lista."))
+            raise DatosInvalidos(errores)
+        if len(actividades) != NUM_ACTIVIDADES:
+            errores.append(
+                ErrorCampo("actividades", "CANTIDAD", "Se requieren tres actividades.")
+            )
+            raise DatosInvalidos(errores)
+    
+        validadas = []
+        validadores = {"nombre": validar_nombre, "nota": validar_nota, "peso": validar_peso}
+        for indice, actividad in enumerate(actividades):
+            ruta = f"actividades.{indice}"
+            if not isinstance(actividad, dict):
+                errores.append(ErrorCampo(ruta, "TIPO", "La actividad debe ser un objeto."))
+                continue
+            errores.extend(_validar_claves(actividad, set(validadores), ruta))
+            valores = {}
+            for clave, validar in validadores.items():
+                if clave in actividad:
+                    try:
+                        valores[clave] = validar(actividad[clave], f"{ruta}.{clave}")
+                    except DatosInvalidos as error:
+                        errores.extend(error.campos)
+            if len(valores) == len(validadores):
+                validadas.append(Actividad(**valores))
+        if errores:
+>           raise DatosInvalidos(errores)
+E           sigen.domain.DatosInvalidos: Revisa los datos.
+
+src\sigen\validators.py:135: DatosInvalidos
+=============================== tests coverage ================================
+______________ coverage: platform win32, python 3.11.18-final-0 _______________
+
+Name                      Stmts   Miss Branch BrPart  Cover   Missing
+---------------------------------------------------------------------
+src\sigen\__init__.py         0      0      0      0   100%
+src\sigen\api.py             44      0      4      0   100%
+src\sigen\calculator.py      17      0      0      0   100%
+src\sigen\config.py          18      0      0      0   100%
+src\sigen\domain.py          31      0      0      0   100%
+src\sigen\schemas.py          5      0      0      0   100%
+src\sigen\validators.py      88      0     46      0   100%
+---------------------------------------------------------------------
+TOTAL                       203      0     50      0   100%
+Coverage HTML written to dir htmlcov
+Coverage JSON written to file coverage.json
+=========================== short test summary info ===========================
+FAILED tests/api/test_api.py::test_notas_frontera_validas[5] - AssertionError...
+FAILED tests/contract/test_contrato_exito.py::test_tp08_tp09_umbral_de_aprobacion[maximo-5.0]
+FAILED tests/contract/test_contrato_exito.py::test_notas_frontera_validas[TP-04]
+FAILED tests/unit/test_calculator.py::test_notas_validas[5] - sigen.domain.Da...
+FAILED tests/unit/test_calculator.py::test_notas_enteras[5] - sigen.domain.Da...
+FAILED tests/unit/test_calculator.py::test_extremos_del_calculo[5-APROBADO]
+======================== 6 failed, 249 passed in 4.48s ========================
+
+FALLO: Pytest terminó con código 1.
+Código de salida: 1
