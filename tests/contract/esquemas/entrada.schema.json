@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigen.local/esquemas/entrada.schema.json",
+  "title": "Petición de POST /api/v1/calcular",
+  "description": "Estructura y límites por campo. La suma de pesos, la longitud tras recortar el nombre y la distinción entre el token 30 y 30.0 son reglas de negocio comprobadas aparte.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["actividades"],
+  "properties": {
+    "actividades": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["nombre", "nota", "peso"],
+        "properties": {
+          "nombre": {"type": "string", "pattern": "\\S"},
+          "nota": {"type": "number", "minimum": 0, "maximum": 5, "multipleOf": 0.1},
+          "peso": {"type": "integer", "minimum": 0, "maximum": 100}
+        }
+      }
+    }
+  }
+}

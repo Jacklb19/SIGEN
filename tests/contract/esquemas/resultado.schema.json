@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigen.local/esquemas/resultado.schema.json",
+  "title": "Respuesta 200 de POST /api/v1/calcular",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["promedio_ponderado", "nota_definitiva", "estado", "ponderacion_total"],
+  "properties": {
+    "promedio_ponderado": {"type": "number", "minimum": 0, "maximum": 5},
+    "nota_definitiva": {"type": "number", "minimum": 0, "maximum": 5, "multipleOf": 0.1},
+    "estado": {"enum": ["APROBADO", "REPROBADO"]},
+    "ponderacion_total": {"type": "integer", "const": 100}
+  }
+}

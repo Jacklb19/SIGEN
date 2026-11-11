@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigen.local/esquemas/error.schema.json",
+  "title": "Envoltorio estable de error",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["error"],
+  "properties": {
+    "error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["codigo", "mensaje", "campos"],
+      "properties": {
+        "codigo": {"enum": ["VALIDACION", "PONDERACION_INVALIDA", "ERROR_INTERNO"]},
+        "mensaje": {"type": "string", "minLength": 1},
+        "campos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["ruta", "codigo", "mensaje"],
+            "properties": {
+              "ruta": {"type": "string", "minLength": 1},
+              "codigo": {
+                "enum": [
+                  "JSON_INVALIDO", "REQUERIDO", "TIPO", "RANGO", "PRECISION",
+                  "LONGITUD", "CAMPO_DESCONOCIDO", "CANTIDAD", "SUMA_PESOS"
+                ]
+              },
+              "mensaje": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      }
+    }
+  }
+}
