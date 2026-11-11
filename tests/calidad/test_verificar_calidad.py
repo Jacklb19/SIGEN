@@ -59,14 +59,14 @@ def test_la_puerta_ignora_el_porcentaje_combinado(tmp_path):
 
 
 def test_reporte_ausente_falla(tmp_path):
-    with pytest.raises(vc.ReporteInvalido, match="No existe"):
+    with pytest.raises(vc.ReporteInvalidoError, match="No existe"):
         vc.leer_cobertura(tmp_path / "coverage.json")
 
 
 def test_cero_sentencias_falla(tmp_path):
     ruta = escribir_reporte(tmp_path, totales(0, 0))
 
-    with pytest.raises(vc.ReporteInvalido, match="sentencias"):
+    with pytest.raises(vc.ReporteInvalidoError, match="sentencias"):
         vc.leer_cobertura(ruta)
 
 
@@ -78,14 +78,14 @@ def test_reporte_mal_formado_falla(tmp_path, contenido):
     ruta = tmp_path / "coverage.json"
     ruta.write_text(contenido, encoding="utf-8")
 
-    with pytest.raises(vc.ReporteInvalido, match="mal formado"):
+    with pytest.raises(vc.ReporteInvalidoError, match="mal formado"):
         vc.leer_cobertura(ruta)
 
 
 def test_lineas_incoherentes_fallan(tmp_path):
     ruta = escribir_reporte(tmp_path, totales(11, 10))
 
-    with pytest.raises(vc.ReporteInvalido, match="coherentes"):
+    with pytest.raises(vc.ReporteInvalidoError, match="coherentes"):
         vc.leer_cobertura(ruta)
 
 

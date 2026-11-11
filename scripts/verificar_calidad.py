@@ -45,7 +45,7 @@ SALIDA_REPORTE_INVALIDO = 3
 SALIDA_UMBRAL_INCUMPLIDO = 4
 
 
-class ReporteInvalido(Exception):
+class ReporteInvalidoError(Exception):
     """El reporte de cobertura falta, está mal formado o no mide código."""
 
 
@@ -68,7 +68,7 @@ class Cobertura:
 def leer_cobertura(ruta: Path) -> Cobertura:
     """Extrae los totales del JSON de coverage.py sin usar percent_covered."""
     if not ruta.is_file():
-        raise ReporteInvalido(f"No existe el reporte de cobertura: {ruta}")
+        raise ReporteInvalidoError(f"No existe el reporte de cobertura: {ruta}")
     try:
         totales = json.loads(ruta.read_text(encoding="utf-8"))["totals"]
         cobertura = Cobertura(
@@ -78,11 +78,12 @@ def leer_cobertura(ruta: Path) -> Cobertura:
             ramas=int(totales.get("num_branches", 0)),
         )
     except (json.JSONDecodeError, KeyError, TypeError, ValueError) as error:
-        raise ReporteInvalido(f"Reporte de cobertura mal formado: {error}") from error
+        mensaje = f"Reporte de cobertura mal formado: {error}"
+        raise ReporteInvalidoError(mensaje) from error
     if cobertura.sentencias <= 0:
-        raise ReporteInvalido("El reporte no contiene sentencias productivas.")
+        raise ReporteInvalidoError("El reporte no contiene sentencias productivas.")
     if not 0 <= cobertura.lineas_cubiertas <= cobertura.sentencias:
-        raise ReporteInvalido("Las líneas cubiertas no son coherentes.")
+        raise ReporteInvalidoError("Las líneas cubiertas no son coherentes.")
     return cobertura
 
 
@@ -120,7 +121,7 @@ def main() -> int:
 
     try:
         cobertura = leer_cobertura(REPORTE_JSON)
-    except ReporteInvalido as error:
+    except ReporteInvalidoError as error:
         print(f"\nFALLO: {error}")
         return SALIDA_REPORTE_INVALIDO
 
