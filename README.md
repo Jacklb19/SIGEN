@@ -17,7 +17,7 @@ Es un simulador con datos ficticios, sin cuentas, base de datos ni integración 
 | Puerta de calidad (líneas ≥ 80 %, ramas informadas) | Implementada: 255 pruebas, líneas 203/203, ramas 50/50 | Stefven |
 | Ruff y Bandit | Sin hallazgos en la puerta; hallazgos ampliados registrados | Stefven |
 | Carga con Locust (10/20/50 usuarios) | Medida localmente | Stefven |
-| GitHub Actions | **Workflow preparado y comandos verificados localmente; ejecución remota pendiente** de publicar con autorización | Stefven |
+| GitHub Actions | Ejecución remota **exitosa** en la rama `stefven/calidad` ([run](https://github.com/Jacklb19/SIGEN/actions/runs/42962657637)) | Stefven |
 | Docker y RF-09 (nota necesaria) | Fuera del primer alcance | — |
 
 ## Documentación
@@ -112,7 +112,7 @@ Repetir con `-u 20` y `-u 50`. Sin `--headless`, Locust abre su panel en <http:/
 
 ## Límites conocidos
 
-- La ejecución de CI en GitHub no se ha comprobado (requiere publicar con autorización).
+- La CI remota se comprobó en la rama `stefven/calidad`; falta integrarla en `main` mediante PR coordinado con Jose.
 - Las mediciones de carga son locales, con generador y servidor en el mismo equipo, y no fijan ni prometen un SLO.
 - Docker y RF-09 quedan fuera del primer alcance; confirmar con la rúbrica si son exigibles.
 

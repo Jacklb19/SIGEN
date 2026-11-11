@@ -10,4 +10,4 @@ Salidas reales seleccionadas; los reportes generados (`htmlcov/`, `coverage.json
 | `carga/corrida-1/` | Primera corrida, con 7 fallos HTTP 0 en el perfil de 20 usuarios | ídem |
 | `mantenimiento/` | Defecto inducido `nota < 5.0` y corrección, en copia aislada | [Mantenimiento](../mantenimiento.md) |
 
-Pendiente: captura o enlace de la ejecución de GitHub Actions, tras publicar con autorización.
+GitHub Actions: ejecución `success` del workflow `CI` en `stefven/calidad`, commit `9d9a095`: https://github.com/Jacklb19/SIGEN/actions/runs/42962657637. El artefacto `cobertura` de esa ejecución contiene `coverage.json` y `htmlcov/`.

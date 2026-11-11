@@ -9,7 +9,7 @@ Frente de Stefven: configuración reproducible, puerta de cobertura, análisis e
 | SO | Windows 11 Home Single Language 10.0.26300 |
 | CPU | Intel Core Ultra 9 185H (16 núcleos, 22 hilos) |
 | RAM | 31,4 GB |
-| Python | 3.11.18 (conda-forge) en `.venv` |
+| Python | 3.11.18 (conda-forge) en `.venv` durante las mediciones; después se instaló Python 3.11.9 (python.org) y la puerta se repitió con el mismo resultado (255 aprobadas, 203/203 líneas, 50/50 ramas) |
 | Dependencias | Las de `requirements.txt` y `requirements-dev.txt` (FastAPI 0.162.4, Starlette 1.10.0, Uvicorn 0.54.0, Pydantic 2.14.3, pytest 9.2.0, pytest-cov 7.1.0, coverage 7.17.2, httpx2 2.16.0, jsonschema 4.26.0, Ruff 0.17.4, Bandit 1.9.4, Locust 2.47.0) |
 
 ## 2. Dependencias y advertencia Starlette/httpx
@@ -77,7 +77,7 @@ Además de la puerta, se ejecutó una exploración ampliada con reglas `N` (nomb
 |---|---|
 | Workflow preparado | **Sí** |
 | Comandos verificados localmente | **Sí** (Windows, mismos comandos y locks; YAML validado sintácticamente) |
-| Ejecución remota comprobada | **No.** Requiere publicar la rama (push) con autorización. Tras hacerlo, registrar aquí el enlace de la ejecución. |
+| Ejecución remota comprobada | **Sí.** Push autorizado de `stefven/calidad` el 11-nov-2026; workflow `CI` sobre el commit `9d9a095`, conclusión `success` ([run](https://github.com/Jacklb19/SIGEN/actions/runs/42962657637)). |
 
 ## 6. Pruebas de carga
 
@@ -135,7 +135,7 @@ Los 7 fallos (5 de cálculo, 2 de salud) fueron respuestas **HTTP 0** (sin respu
 
 ## 7. Limitaciones
 
-- Ejecución remota de CI pendiente de autorización para publicar.
+- La CI remota se ejecutó en la rama `stefven/calidad`; la integración en `main` sigue pendiente de PR.
 - Mediciones en Windows con generador y servidor en el mismo equipo; no comparables con otro hardware.
 - `sigen.config.DIRECTORIO_WEB` resuelve `web/` relativo al código fuente: funciona con la instalación editable (`pip install -e .`) indicada; una instalación no editable no incluiría la interfaz. Reportado a Jose como observación, no como defecto del contrato.
 - Docker y RF-09 fuera del alcance inicial; revisar la rúbrica antes de asumir que lo opcional basta.

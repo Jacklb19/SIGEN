@@ -5,7 +5,7 @@ Relaciona requisitos (RF/RNF), riesgos, casos de diseño TP de la guía (§6.3),
 - **Ejecución registrada:** 10 de noviembre de 2026 (UTC 11-nov 04:5x), rama `stefven/calidad`, Windows 11, Python 3.11.18.
 - **Comando:** `python scripts/verificar_calidad.py` → **255 aprobadas, 0 fallidas**, líneas 203/203, ramas 50/50. Evidencia: [evidencias/calidad/puerta_calidad.txt](evidencias/calidad/puerta_calidad.txt).
 - **Contrato contra servidor real:** con Uvicorn (`--workers 1`) y `SIGEN_URL_BASE=http://127.0.0.1:8000`, las 118 pruebas de `tests/contract` también pasaron.
-- La CI remota **no** se ha ejecutado (falta publicar la rama con autorización): la columna «Observado» corresponde a la ejecución local.
+- La columna «Observado» corresponde a la ejecución local. La CI remota (Ubuntu, Python 3.11) también terminó en `success` sobre el commit `9d9a095` ([run](https://github.com/Jacklb19/SIGEN/actions/runs/42962657637)).
 
 Abreviaturas de ubicación: **U** = `tests/unit/test_calculator.py` (Jose), **A** = `tests/api/test_api.py` (Jose), **C-éx / C-err / C-esq / C-500** = `tests/contract/test_contrato_{exito,errores,esquemas,fallo_interno}.py` (Stefven). Las pruebas de contrato no importan `sigen.config` ni `sigen.schemas`: usan constantes y esquemas propios (`tests/contract/contrato_esperado.py`, `tests/contract/esquemas/`).
 
@@ -80,5 +80,5 @@ Abreviaturas de ubicación: **U** = `tests/unit/test_calculator.py` (Jose), **A*
 
 ## Pendiente
 
-- Ejecución en GitHub Actions (requiere push autorizado).
+- Integración en `main` mediante PR coordinado con Jose.
 - Pruebas de interfaz: responsabilidad de Santiago, registradas en [pruebas_interfaz.md](pruebas_interfaz.md).
