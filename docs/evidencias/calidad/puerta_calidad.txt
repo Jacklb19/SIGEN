@@ -1,4 +1,4 @@
-# Fecha: 2026-11-11T04:50:29Z | rama stefven/calidad (incluye la corrección N818)
+# Fecha: 2026-11-11T04:51:41Z | rama stefven/calidad @ 9582688
 Python 3.11.18
 pytest 9.2.0
 Coverage.py, version 7.17.2 with C extension
@@ -40,7 +40,7 @@ src\sigen\validators.py      88      0     46      0   100%
 TOTAL                       203      0     50      0   100%
 Coverage HTML written to dir htmlcov
 Coverage JSON written to file coverage.json
-============================= 255 passed in 4.71s =============================
+============================= 255 passed in 3.89s =============================
 
 === Puerta de calidad ===
 Líneas: 203/203 (100.00%); mínimo exigido 80%.
