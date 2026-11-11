@@ -1,0 +1,330 @@
+/* SIGEN Lite — estilos de la interfaz.
+   Paleta con contraste AA, foco visible y diseño adaptable.
+   Punto de corte: 768 px (debajo, una tarjeta apilada por actividad). */
+
+:root {
+  --color-fondo: #f4f6f8;
+  --color-superficie: #ffffff;
+  --color-texto: #1a2430;
+  --color-texto-suave: #4a5a6a;
+  --color-borde: #c3ccd4;
+  --color-primario: #1b4f8a;
+  --color-primario-activo: #153d6b;
+  --color-error: #b3261e;
+  --color-error-fondo: #fdeceb;
+  --color-exito: #1d6b3a;
+  --color-exito-fondo: #e8f4ec;
+  --color-reprobado: #8a5a00;
+  --color-reprobado-fondo: #fdf3e0;
+  --color-foco: #0b5cd7;
+  --radio: 8px;
+  --ancho-maximo: 720px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 24px 16px 48px;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+}
+
+.contenedor {
+  max-width: var(--ancho-maximo);
+  margin: 0 auto;
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  padding: 24px;
+}
+
+.encabezado h1 {
+  margin: 0;
+  font-size: 1.6rem;
+}
+
+.subtitulo {
+  margin: 4px 0 20px;
+  color: var(--color-texto-suave);
+}
+
+.titulo-seccion {
+  font-size: 1.15rem;
+  margin: 0 0 12px;
+}
+
+/* Resumen general de errores */
+.resumen-errores {
+  border: 1px solid var(--color-error);
+  background: var(--color-error-fondo);
+  border-radius: var(--radio);
+  padding: 12px 16px;
+  margin-bottom: 20px;
+}
+
+.resumen-errores-texto {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-error);
+}
+
+.resumen-errores-lista {
+  margin: 8px 0 0;
+  padding-left: 20px;
+  color: var(--color-texto);
+}
+
+.resumen-errores-lista:empty {
+  display: none;
+}
+
+/* Rejilla de actividades: fila de 3 columnas en escritorio */
+.rejilla-actividades {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.fila-encabezados {
+  display: none;
+}
+
+.actividad {
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  padding: 16px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.actividad legend {
+  font-weight: 600;
+  padding: 0 6px;
+  color: var(--color-texto-suave);
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.campo label {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.campo input {
+  min-height: 44px;
+  padding: 8px 10px;
+  font-size: 1rem;
+  border: 1px solid var(--color-borde);
+  border-radius: 6px;
+  color: var(--color-texto);
+  background: var(--color-superficie);
+}
+
+.campo input:focus-visible {
+  outline: 3px solid var(--color-foco);
+  outline-offset: 1px;
+  border-color: var(--color-foco);
+}
+
+.campo input[aria-invalid="true"] {
+  border-color: var(--color-error);
+  border-width: 2px;
+}
+
+.campo input:disabled {
+  background: var(--color-fondo);
+  color: var(--color-texto-suave);
+}
+
+.error-campo {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-error);
+}
+
+.total-pesos {
+  margin: 16px 0 4px;
+  font-size: 1rem;
+}
+
+.error-pesos {
+  margin-top: 4px;
+}
+
+/* Botones */
+.acciones {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.boton {
+  min-height: 44px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.boton:focus-visible {
+  outline: 3px solid var(--color-foco);
+  outline-offset: 2px;
+}
+
+.boton-primario {
+  background: var(--color-primario);
+  color: #ffffff;
+}
+
+.boton-primario:hover:not(:disabled) {
+  background: var(--color-primario-activo);
+}
+
+.boton-secundario {
+  background: var(--color-superficie);
+  color: var(--color-primario);
+  border-color: var(--color-primario);
+}
+
+.boton-secundario:hover:not(:disabled) {
+  background: var(--color-fondo);
+}
+
+.boton:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+/* Resultado */
+.resultado {
+  margin-top: 24px;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  padding: 16px;
+}
+
+.resultado.desactualizado {
+  border-style: dashed;
+  opacity: 0.75;
+}
+
+.aviso-desactualizado {
+  margin: 0 0 8px;
+  font-size: 0.9rem;
+  color: var(--color-texto-suave);
+  font-style: italic;
+}
+
+.resultado-datos {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+}
+
+.resultado-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.resultado-item dt {
+  font-weight: 600;
+}
+
+.resultado-item dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.estado {
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 999px;
+}
+
+.estado.aprobado {
+  color: var(--color-exito);
+  background: var(--color-exito-fondo);
+}
+
+.estado.reprobado {
+  color: var(--color-reprobado);
+  background: var(--color-reprobado-fondo);
+}
+
+.nota-redondeo {
+  margin: 12px 0 0;
+  font-size: 0.85rem;
+  color: var(--color-texto-suave);
+}
+
+/* Escritorio: encabezados de columna y filas de tres columnas */
+@media (min-width: 768px) {
+  .fila-encabezados {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 12px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--color-texto-suave);
+    padding: 0 6px;
+  }
+
+  .actividad {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 12px;
+    align-items: start;
+  }
+
+  .actividad legend {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .actividad .campo label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .acciones {
+    flex-direction: row;
+  }
+
+  .boton {
+    width: auto;
+  }
+
+  .resultado-datos {
+    flex-direction: row;
+    gap: 32px;
+  }
+
+  .resultado-item {
+    flex-direction: column;
+    gap: 2px;
+  }
+}
