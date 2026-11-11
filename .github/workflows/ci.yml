@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  calidad:
+    name: Calidad (Python 3.11)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+
+      - name: Preparar Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: Instalar dependencias fijadas y el paquete
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install -r requirements-dev.txt
+          python -m pip install --no-deps -e .
+          python -m pip check
+
+      - name: Ruff (lint)
+        run: python -m ruff check .
+
+      - name: Ruff (formato)
+        run: python -m ruff format --check .
+
+      - name: Bandit (seguridad de src)
+        run: python -m bandit -c pyproject.toml -r src -q
+
+      - name: Suite, cobertura y puerta de líneas
+        run: python scripts/verificar_calidad.py
+
+      - name: Publicar reportes de cobertura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cobertura
+          path: |
+            coverage.json
+            htmlcov/
+          if-no-files-found: warn
