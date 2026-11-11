@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SIGEN Lite — Simulador de definitiva académica</title>
+  <meta name="description" content="Simulador de definitiva académica de SIGEN Lite: calcula el promedio ponderado y el estado de aprobación de tres actividades.">
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <main class="contenedor">
+    <header class="encabezado">
+      <h1>SIGEN Lite</h1>
+      <p class="subtitulo">Simulador de definitiva académica</p>
+    </header>
+
+    <div id="resumen-errores" class="resumen-errores" role="alert" hidden>
+      <p id="resumen-errores-texto" class="resumen-errores-texto"></p>
+      <ul id="resumen-errores-lista" class="resumen-errores-lista"></ul>
+    </div>
+
+    <form id="formulario" novalidate>
+      <h2 class="titulo-seccion">Actividades</h2>
+
+      <div class="rejilla-actividades" role="group" aria-label="Actividades de la nota definitiva">
+        <div class="fila-encabezados" aria-hidden="true">
+          <span>Actividad</span>
+          <span>Nota (0.0 – 5.0)</span>
+          <span>Peso (0 – 100)</span>
+        </div>
+
+        <fieldset class="actividad" data-indice="0">
+          <legend>Actividad 1</legend>
+          <div class="campo">
+            <label for="nombre-0">Nombre</label>
+            <input id="nombre-0" data-campo="nombre" type="text" autocomplete="off" maxlength="120">
+            <p class="error-campo" id="error-nombre-0" hidden></p>
+          </div>
+          <div class="campo">
+            <label for="nota-0">Nota (0.0 – 5.0)</label>
+            <input id="nota-0" data-campo="nota" type="text" inputmode="decimal" autocomplete="off">
+            <p class="error-campo" id="error-nota-0" hidden></p>
+          </div>
+          <div class="campo">
+            <label for="peso-0">Peso (0 – 100)</label>
+            <input id="peso-0" data-campo="peso" type="text" inputmode="numeric" autocomplete="off">
+            <p class="error-campo" id="error-peso-0" hidden></p>
+          </div>
+        </fieldset>
+
+        <fieldset class="actividad" data-indice="1">
+          <legend>Actividad 2</legend>
+          <div class="campo">
+            <label for="nombre-1">Nombre</label>
+            <input id="nombre-1" data-campo="nombre" type="text" autocomplete="off" maxlength="120">
+            <p class="error-campo" id="error-nombre-1" hidden></p>
+          </div>
+          <div class="campo">
+            <label for="nota-1">Nota (0.0 – 5.0)</label>
+            <input id="nota-1" data-campo="nota" type="text" inputmode="decimal" autocomplete="off">
+            <p class="error-campo" id="error-nota-1" hidden></p>
+          </div>
+          <div class="campo">
+            <label for="peso-1">Peso (0 – 100)</label>
+            <input id="peso-1" data-campo="peso" type="text" inputmode="numeric" autocomplete="off">
+            <p class="error-campo" id="error-peso-1" hidden></p>
+          </div>
+        </fieldset>
+
+        <fieldset class="actividad" data-indice="2">
+          <legend>Actividad 3</legend>
+          <div class="campo">
+            <label for="nombre-2">Nombre</label>
+            <input id="nombre-2" data-campo="nombre" type="text" autocomplete="off" maxlength="120">
+            <p class="error-campo" id="error-nombre-2" hidden></p>
+          </div>
+          <div class="campo">
+            <label for="nota-2">Nota (0.0 – 5.0)</label>
+            <input id="nota-2" data-campo="nota" type="text" inputmode="decimal" autocomplete="off">
+            <p class="error-campo" id="error-nota-2" hidden></p>
+          </div>
+          <div class="campo">
+            <label for="peso-2">Peso (0 – 100)</label>
+            <input id="peso-2" data-campo="peso" type="text" inputmode="numeric" autocomplete="off">
+            <p class="error-campo" id="error-peso-2" hidden></p>
+          </div>
+        </fieldset>
+      </div>
+
+      <p class="total-pesos">
+        Total de pesos: <strong id="total-pesos">0 / 100</strong>
+      </p>
+      <p class="error-campo error-pesos" id="error-pesos" hidden></p>
+
+      <div class="acciones">
+        <button type="submit" id="boton-calcular" class="boton boton-primario">Calcular definitiva</button>
+        <button type="button" id="boton-restablecer" class="boton boton-secundario">Restablecer</button>
+      </div>
+    </form>
+
+    <section id="resultado" class="resultado" aria-live="polite" hidden>
+      <h2 class="titulo-seccion">Resultado</h2>
+      <p id="aviso-desactualizado" class="aviso-desactualizado" hidden>
+        Resultado anterior: los datos cambiaron desde este cálculo.
+      </p>
+      <dl class="resultado-datos">
+        <div class="resultado-item">
+          <dt>Promedio ponderado</dt>
+          <dd id="resultado-promedio">—</dd>
+        </div>
+        <div class="resultado-item">
+          <dt>Definitiva</dt>
+          <dd id="resultado-definitiva">—</dd>
+        </div>
+        <div class="resultado-item">
+          <dt>Estado</dt>
+          <dd id="resultado-estado" class="estado">—</dd>
+        </div>
+      </dl>
+      <p class="nota-redondeo">
+        El redondeo a un decimal es una política de este simulador académico,
+        no una regla institucional certificada.
+      </p>
+    </section>
+  </main>
+</body>
+</html>
