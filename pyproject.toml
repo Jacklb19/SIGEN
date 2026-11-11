@@ -1,0 +1,73 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sigen"
+version = "0.1.0"
+description = "SIGEN Lite: simulador académico de calificaciones con API FastAPI."
+readme = "README.md"
+requires-python = ">=3.11"
+# Rangos compatibles. Las versiones exactas (incluidas las transitivas) se fijan
+# en requirements.txt y requirements-dev.txt, generados desde este archivo.
+dependencies = [
+    "fastapi>=0.162.4,<0.163",
+    "uvicorn>=0.54.0,<0.55",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9.2.0,<10",
+    "pytest-cov>=7.1.0,<8",
+    # Starlette 1.10 depreca httpx en TestClient y recomienda httpx2.
+    "httpx2>=2.16.0,<3",
+    "jsonschema>=4.26.0,<5",
+    "ruff==0.17.4",
+    "bandit>=1.9.4,<2",
+    "locust>=2.47.0,<3",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+# --- Pytest: única fuente de configuración (no se usa pytest.ini) -----------
+[tool.pytest.ini_options]
+minversion = "9.0"
+testpaths = ["tests"]
+addopts = ["-ra", "--strict-markers", "--strict-config"]
+# Cualquier advertencia (incluidas deprecaciones) hace fallar la suite.
+filterwarnings = ["error"]
+
+# --- Cobertura: la puerta de líneas la aplica scripts/verificar_calidad.py --
+[tool.coverage.run]
+source = ["sigen"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+
+[tool.coverage.html]
+directory = "htmlcov"
+
+[tool.coverage.json]
+output = "coverage.json"
+
+# --- Ruff: estilo y posibles defectos (no es un escáner de seguridad) ------
+[tool.ruff]
+target-version = "py311"
+line-length = 88
+extend-exclude = ["docs/evidencias"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "C4", "RUF"]
+# UP042 propone StrEnum para sigen.domain.Estado. Cambia la semántica de str()
+# y pertenece al frente de Jose: decisión registrada en docs/reporte_calidad.md.
+ignore = ["UP042"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["sigen"]
+
+# --- Bandit: patrones de seguridad del código productivo -------------------
+[tool.bandit]
+exclude_dirs = ["tests", ".venv"]
