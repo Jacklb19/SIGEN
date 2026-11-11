@@ -1,8 +1,8 @@
 # Maqueta de la interfaz de SIGEN Lite
 
 Propuesta visual y plan de implementación del frente de interfaz (Santiago).
-Estado: **pendiente de aprobación de Jose**. No se implementará HTML/CSS/JS hasta
-recibir aprobación explícita.
+Estado: **aprobada por Jose el 10 de noviembre de 2026** (aprobación verbal
+comunicada a Santiago). La implementación procedió después de esa aprobación.
 
 Base contractual: `docs/contrato_api.md` (secciones de cálculo, errores y
 estáticos) y `SIGEN_Lite_Guia_Completa.md` (secciones 2 y 5).
@@ -215,8 +215,9 @@ móvil, error de servidor y desconexión.
 
 ## 6. Aprobación
 
-- [ ] Maqueta de escritorio aprobada por Jose.
-- [ ] Maqueta de móvil aprobada por Jose.
-- [ ] Estados (4.1 a 4.9) aprobados por Jose.
+- [x] Maqueta de escritorio aprobada por Jose.
+- [x] Maqueta de móvil aprobada por Jose.
+- [x] Estados (4.1 a 4.9) aprobados por Jose.
 
-Comentarios de aprobación: _(pendiente)_
+Comentarios de aprobación: aprobación verbal de Jose comunicada a Santiago el
+10 de noviembre de 2026, sin cambios solicitados sobre la propuesta.
