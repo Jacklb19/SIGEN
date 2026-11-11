@@ -79,6 +79,13 @@ def _json_decimal(respuesta):
     return json.loads(respuesta.content, parse_float=Decimal)
 
 
+def _sin_respuesta(respuesta) -> str | None:
+    """Describe un fallo de conexión (HTTP 0) con la excepción original."""
+    if respuesta.status_code == 0:
+        return f"Sin respuesta HTTP: {respuesta.error!r}"
+    return None
+
+
 def _es_json(respuesta) -> bool:
     return respuesta.headers.get("content-type", "").startswith("application/json")
 
@@ -93,11 +100,14 @@ class UsuarioSigen(HttpUser):
             RUTA_CALCULO,
             data=cuerpo,
             headers=ENCABEZADO_JSON,
-            name="calcular válido",
+            name="calcular valido",
             catch_response=True,
         ) as respuesta:
             if respuesta.status_code != 200 or not _es_json(respuesta):
-                respuesta.failure(f"HTTP {respuesta.status_code} inesperado")
+                respuesta.failure(
+                    _sin_respuesta(respuesta)
+                    or f"HTTP {respuesta.status_code} inesperado"
+                )
                 return
             try:
                 datos = _json_decimal(respuesta)
@@ -126,7 +136,10 @@ class UsuarioSigen(HttpUser):
             ):
                 respuesta.success()
             else:
-                respuesta.failure(f"Salud no conforme (HTTP {respuesta.status_code})")
+                respuesta.failure(
+                    _sin_respuesta(respuesta)
+                    or f"Salud no conforme (HTTP {respuesta.status_code})"
+                )
 
     @task(PESO_INVALIDO)
     def calcular_invalido(self):
@@ -137,12 +150,13 @@ class UsuarioSigen(HttpUser):
             RUTA_CALCULO,
             data=cuerpo,
             headers=ENCABEZADO_JSON,
-            name=f"inválido esperado: {nombre}",
+            name=f"invalido esperado: {nombre}",
             catch_response=True,
         ) as respuesta:
             if respuesta.status_code != http or not _es_json(respuesta):
                 respuesta.failure(
-                    f"Se esperaba HTTP {http} y llegó {respuesta.status_code}"
+                    _sin_respuesta(respuesta)
+                    or f"Se esperaba HTTP {http} y llegó {respuesta.status_code}"
                 )
                 return
             try:
