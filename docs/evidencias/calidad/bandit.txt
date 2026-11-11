@@ -1,0 +1,73 @@
+# Fecha: 2026-11-11T04:50:53Z
+__main__.py 1.9.4
+
+## Puerta de CI (código productivo)
+$ python -m bandit -c pyproject.toml -r src -q
+Código de salida: 0
+
+## Análisis ampliado de archivos de Stefven (fuera de la puerta de CI)
+$ python -m bandit -c pyproject.toml -r scripts locustfile.py
+Run started:2026-11-11 04:50:54.799015+00:00
+
+Test results:
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: .\locustfile.py:98:37
+97	    def calcular_valido(self):
+98	        cuerpo, definitiva, estado = random.choice(CASOS_VALIDOS)
+99	        with self.client.post(
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b311-random
+   Location: .\locustfile.py:146:59
+145	    def calcular_invalido(self):
+146	        nombre, cuerpo, http, codigo, ruta, codigo_campo = random.choice(
+147	            CASOS_INVALIDOS
+148	        )
+149	        with self.client.post(
+
+--------------------------------------------------
+>> Issue: [B404:blacklist] Consider possible security implications associated with the subprocess module.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess
+   Location: scripts\verificar_calidad.py:21:0
+20	import json
+21	import subprocess
+22	import sys
+
+--------------------------------------------------
+>> Issue: [B603:subprocess_without_shell_equals_true] subprocess call - check for execution of untrusted input.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html
+   Location: scripts\verificar_calidad.py:117:16
+116	    # Lista fija de argumentos, sin shell ni datos externos.
+117	    resultado = subprocess.run(COMANDO_PYTEST, cwd=RAIZ, check=False)
+118	    if resultado.returncode != 0:
+
+--------------------------------------------------
+
+Code scanned:
+	Total lines of code: 251
+	Total lines skipped (#nosec): 0
+	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 0
+
+Run metrics:
+	Total issues (by severity):
+		Undefined: 0
+		Low: 4
+		Medium: 0
+		High: 0
+	Total issues (by confidence):
+		Undefined: 0
+		Low: 0
+		Medium: 0
+		High: 4
+Files skipped (0):
+Código de salida: 1

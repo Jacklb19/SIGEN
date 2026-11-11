@@ -1,0 +1,28 @@
+# Fecha: 2026-11-11T04:50:28Z
+ruff 0.17.4
+
+## Puerta (configuración de pyproject.toml)
+$ python -m ruff check .
+All checks passed!
+Código de salida: 0
+$ python -m ruff format --check .
+27 files already formatted
+Código de salida: 0
+
+## Exploración ampliada: reglas adicionales N y PT, sin ignorar UP042 (no forma parte de la puerta)
+$ python -m ruff check . --isolated --target-version py311 --select E,F,W,I,B,UP,SIM,C4,RUF,N,PT --output-format concise
+src\sigen\domain.py:8:7: UP042 Class Estado inherits from both `str` and `enum.Enum`
+src\sigen\domain.py:35:7: N818 Exception name `DatosInvalidos` should be named with an Error suffix
+tests\api\test_api.py:66:5: PT006 Wrong type passed to first argument of `pytest.mark.parametrize`; expected `tuple`
+tests\api\test_api.py:110:5: PT006 Wrong type passed to first argument of `pytest.mark.parametrize`; expected `tuple`
+tests\api\test_api.py:208:5: PT006 Wrong type passed to first argument of `pytest.mark.parametrize`; expected `tuple`
+tests\api\test_api.py:252:5: PT006 Wrong type passed to first argument of `pytest.mark.parametrize`; expected `tuple`
+tests\unit\test_calculator.py:32:5: PT006 Wrong type passed to first argument of `pytest.mark.parametrize`; expected `tuple`
+tests\unit\test_calculator.py:100:5: PT006 Wrong type passed to first argument of `pytest.mark.parametrize`; expected `tuple`
+tests\unit\test_calculator.py:115:5: PT006 Wrong type passed to first argument of `pytest.mark.parametrize`; expected `tuple`
+Found 9 errors.
+8 unsafe fixes available with `--fix --unsafe-fixes`.
+Código de salida: 1
+
+## Antes de corregir N818 en scripts/verificar_calidad.py (misma exploración, 04:49Z)
+scripts\verificar_calidad.py:48:7: N818 Exception name `ReporteInvalido` should be named with an Error suffix
