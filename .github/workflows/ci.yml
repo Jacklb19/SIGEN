@@ -91,8 +91,8 @@ jobs:
       - name: Verificar la imagen de aplicación
         run: |
           docker build -t sigen:ci .
-          docker run --rm -d --name sigen-ci -p 127.0.0.1:8765:8000 sigen:ci
-          trap 'docker stop sigen-ci' EXIT
-          curl --fail --silent --show-error --retry 15 --retry-connrefused --retry-delay 1 http://127.0.0.1:8765/health
+          docker run -d --name sigen-ci -p 127.0.0.1:8765:8000 sigen:ci
+          trap 'docker logs sigen-ci; docker rm -f sigen-ci' EXIT
+          curl --fail --silent --show-error --max-time 3 --retry 15 --retry-all-errors --retry-delay 1 http://127.0.0.1:8765/health
           curl --fail --silent --show-error --output /dev/null http://127.0.0.1:8765/
           curl --fail --silent --show-error --output /dev/null http://127.0.0.1:8765/static/app.js
