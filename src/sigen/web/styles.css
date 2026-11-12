@@ -562,9 +562,66 @@ body {
   }
 }
 
+/* Animaciones de estado en CSS puro */
+.campo input,
+.campo select {
+  transition:
+    border-color 0.15s ease-out,
+    background-color 0.15s ease-out;
+}
+
+/* Un campo recién marcado con error se sacude una vez */
+.campo input[aria-invalid="true"] {
+  animation: sacudir 0.32s ease-in-out;
+}
+
+@keyframes sacudir {
+  20% {
+    transform: translateX(-5px);
+  }
+  40% {
+    transform: translateX(5px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(3px);
+  }
+}
+
+/* Los mensajes y las actividades que se agregan aparecen con un deslizamiento */
+.resumen-errores,
+.error-campo,
+.actividad[id^="actividad-extra"] {
+  animation: aparecer 0.25s ease-out;
+}
+
+.mensaje-ponderacion {
+  transition: color 0.2s ease-out;
+}
+
+.boton {
+  transition:
+    background-color 0.15s ease-out,
+    transform 0.08s ease-out;
+}
+
+.boton:active:not(:disabled) {
+  transform: translateY(1px) scale(0.98);
+}
+
+.estado {
+  transition:
+    color 0.2s ease-out,
+    background-color 0.2s ease-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .resultado,
-  .boton[aria-busy="true"]::before {
-    animation: none;
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
   }
 }

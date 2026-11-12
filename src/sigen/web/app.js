@@ -280,6 +280,75 @@ function mostrarResultado(datos) {
   seccionResultado.classList.remove("desactualizado");
   avisoDesactualizado.hidden = true;
   seccionResultado.hidden = false;
+  animarResultado();
+}
+
+/* ---------- Animaciones (opcionales) ---------- */
+
+/* anime.js se sirve desde /static/anime.min.js. Si no cargó o la persona
+   pidió menos movimiento, la interfaz funciona igual, sin animaciones. */
+function puedeAnimar() {
+  return (
+    typeof anime === "function" &&
+    !globalThis.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
+function limpiarEstilosAnimados(elementos) {
+  for (const elemento of elementos) {
+    elemento.style.removeProperty("opacity");
+    elemento.style.removeProperty("transform");
+  }
+}
+
+/* Entrada escalonada de la planilla al abrir la página. */
+function animarEntrada() {
+  if (!puedeAnimar()) {
+    return;
+  }
+  anime({
+    targets:
+      ".encabezado, .campo-materia, .configuracion-simulacion, .ayuda-simulacion, " +
+      "#formulario .titulo-seccion, .fila-encabezados, .actividad:not([hidden]), " +
+      ".controles-actividades, .ponderacion, .acciones",
+    opacity: [0, 1],
+    translateY: [12, 0],
+    delay: anime.stagger(55),
+    duration: 450,
+    easing: "easeOutCubic",
+    complete: (animacion) =>
+      limpiarEstilosAnimados(animacion.animatables.map(({ target }) => target)),
+  });
+}
+
+/* Revelado del resultado: sube la definitiva, aparece el promedio y se
+   estampa el estado. Los textos ya están escritos antes de animar. */
+function animarResultado() {
+  if (!puedeAnimar()) {
+    return;
+  }
+  const piezas = [resultadoDefinitiva, resultadoEstado, resultadoPromedio];
+  anime.remove(piezas);
+  anime
+    .timeline({ easing: "easeOutCubic", complete: () => limpiarEstilosAnimados(piezas) })
+    .add({
+      targets: resultadoDefinitiva,
+      opacity: [0, 1],
+      translateY: [16, 0],
+      duration: 420,
+    })
+    .add({ targets: resultadoPromedio, opacity: [0, 1], duration: 300 }, "-=200")
+    .add(
+      {
+        targets: resultadoEstado,
+        opacity: [0, 1],
+        scale: [1.7, 1],
+        rotate: [-8, 0],
+        duration: 380,
+        easing: "easeOutBack",
+      },
+      "-=120",
+    );
 }
 
 function esResultadoValido(datos) {
@@ -541,3 +610,4 @@ quitarActividad.addEventListener("click", () => cambiarCantidad(-1));
 formulario.addEventListener("submit", calcular);
 formulario.addEventListener("input", alEditarCampo);
 botonRestablecer.addEventListener("click", restablecer);
+animarEntrada();

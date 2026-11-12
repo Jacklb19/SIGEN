@@ -10,7 +10,13 @@ la maqueta aprobada en `docs/maqueta_interfaz.md` y consume la API descrita en
 - `src/sigen/web/styles.css`: estilos, diseño adaptable (punto de corte 768 px) y
   estados visuales (error, éxito, desactualizado, carga).
 - `src/sigen/web/app.js`: validación de entradas, consumo de la API y representación de
-  resultados y errores. Sin dependencias ni framework.
+  resultados y errores. Sin framework.
+- `src/sigen/web/anime.min.js`: anime.js 3.2.2 (licencia MIT), copiada en el
+  repositorio y servida desde `/static`, sin CDN. Anima la entrada de la
+  planilla y el revelado del resultado. Es opcional: si no carga, o con
+  `prefers-reduced-motion`, la interfaz funciona igual sin animaciones. Las
+  animaciones de estado (sacudida de un campo con error, aparición de
+  mensajes, pulsación de botones) son CSS puro.
 
 El backend sirve `index.html` en `/` y expone los recursos empaquetados bajo `/static`.
 
