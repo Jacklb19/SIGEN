@@ -29,8 +29,10 @@ Al agregar o quitar una actividad, ajusta los pesos hasta sumar 100. Cambiar la 
   alineados a la derecha en escritorio y la definitiva como dato principal
   del resultado. Usa solo fuentes del sistema, sin recursos externos.
 - Modo claro y oscuro automáticos según la preferencia del sistema
-  (`prefers-color-scheme`). Las animaciones se desactivan con
-  `prefers-reduced-motion`.
+  (`prefers-color-scheme`). La definitiva y los mensajes de error tienen
+  una animación de aparición en CSS. Las actividades nuevas se desplazan
+  unos píxeles al aparecer y sus campos quedan visibles. El movimiento se
+  desactiva con `prefers-reduced-motion`.
 - Botones Calcular definitiva y Restablecer.
 - Resultado con promedio ponderado, definitiva con exactamente un decimal y
   estado APROBADO/REPROBADO, más la aclaración de que el redondeo es una

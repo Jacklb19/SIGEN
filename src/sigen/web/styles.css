@@ -31,6 +31,8 @@
   --radio: 10px;
   --radio-campo: 6px;
   --ancho-maximo: 720px;
+  --duracion-transicion: 150ms;
+  --duracion-aparicion: 250ms;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -191,6 +193,9 @@ body {
   border-radius: var(--radio-campo);
   color: var(--color-texto);
   background: var(--color-superficie);
+  transition:
+    border-color var(--duracion-transicion) ease-out,
+    background-color var(--duracion-transicion) ease-out;
 }
 
 .campo input:hover:not(:disabled),
@@ -323,6 +328,11 @@ body {
   border-radius: var(--radio-campo);
   border: 1px solid transparent;
   cursor: pointer;
+  transition: background-color var(--duracion-transicion) ease-out;
+}
+
+.boton:active:not(:disabled) {
+  transform: translateY(1px);
 }
 
 .boton:focus-visible {
@@ -378,7 +388,6 @@ body {
   border-radius: var(--radio-campo);
   background: var(--color-superficie-alterna);
   padding: 20px;
-  animation: aparecer 0.25s ease-out;
 }
 
 @keyframes aparecer {
@@ -445,6 +454,21 @@ body {
   font-weight: 600;
   line-height: 1;
   font-variant-numeric: lining-nums tabular-nums;
+}
+
+.resultado:not([hidden]) .resultado-item-definitiva dd,
+.error-campo:not([hidden]) {
+  animation: aparecer var(--duracion-aparicion) ease-out;
+}
+
+.actividad[id^="actividad-extra"]:not([hidden]) {
+  animation: desplazar-actividad var(--duracion-aparicion) ease-out;
+}
+
+@keyframes desplazar-actividad {
+  from {
+    transform: translateY(6px);
+  }
 }
 
 .resultado-item dd.estado {
@@ -563,8 +587,20 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .resultado,
+  .resultado:not([hidden]) .resultado-item-definitiva dd,
+  .error-campo:not([hidden]),
+  .actividad[id^="actividad-extra"]:not([hidden]),
   .boton[aria-busy="true"]::before {
     animation: none;
+  }
+
+  .campo input,
+  .campo select,
+  .boton {
+    transition: none;
+  }
+
+  .boton:active:not(:disabled) {
+    transform: none;
   }
 }
