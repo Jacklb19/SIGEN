@@ -162,6 +162,7 @@ requests==2.34.2
     # via
     #   locust
     #   python-socketio
+    #   sigen (pyproject.toml)
 rich==15.0.0
     # via bandit
 rpds-py==2026.9.1

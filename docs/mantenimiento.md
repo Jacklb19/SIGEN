@@ -1,5 +1,13 @@
 # Mantenimiento y regresión
 
+## Corrección de defectos de interfaz
+
+El commit `d4aa48f` incorporó tres pruebas de regresión. Dos fallaron y reprodujeron defectos reales. El formulario convertía una nota con precisión inválida antes de validarla y trataba de enfocar un campo todavía deshabilitado tras recibir un error 422.
+
+El commit `1c9c3bf` corrigió ambos casos. El formulario valida los decimales antes de convertirlos y restablece los controles antes de mover el foco. `node --test tests/ui/test_interfaz.cjs` ejecutó las tres pruebas con resultado aprobado. GitHub Actions ejecuta el mismo comando.
+
+Para la sustentación, mostrar los dos commits y los resultados de las regresiones. La demostración inducida de 5.0 que sigue se conserva como evidencia histórica.
+
 ## 1. Mantenimiento correctivo: demostración con defecto inducido
 
 **El defecto es inducido a propósito para la demostración; no fue descubierto en producción.** Consiste en cambiar `nota <= NOTA_MAX` por `nota < NOTA_MAX` en `src/sigen/validators.py`, lo que rechazaría la nota válida 5.0 (TP-04, riesgo R1). El defecto **nunca** se deja en `main` ni en la rama de trabajo.

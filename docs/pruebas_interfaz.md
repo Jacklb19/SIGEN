@@ -1,5 +1,10 @@
 # Pruebas de la interfaz
 
+El cierre del 11 de noviembre añade tres regresiones automatizadas en
+`tests/ui/test_interfaz.cjs`. Cubren precisión oculta, ceros finales y foco
+tras 422. Las tres aprobaron con la corrección. El historial de la reparación
+está en [mantenimiento.md](mantenimiento.md).
+
 Registro de las comprobaciones reales del frente de interfaz de SIGEN Lite.
 Fecha: 10 de noviembre de 2026. Rama: `santiago/interfaz`.
 

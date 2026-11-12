@@ -9,17 +9,19 @@ permissions:
 
 jobs:
   calidad:
-    name: Calidad (Python 3.11)
+    name: Calidad (Python 3.12)
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - name: Obtener código
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Preparar Python 3.11
+      - name: Preparar Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
           cache: pip
           cache-dependency-path: |
             requirements.txt
@@ -45,6 +47,24 @@ jobs:
       - name: Suite, cobertura y puerta de líneas
         run: python scripts/verificar_calidad.py
 
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Regresiones de interfaz
+        run: node --test tests/ui/test_interfaz.cjs
+
+      - name: SonarQube Cloud
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.SONAR_ORGANIZATION != '' && vars.SONAR_PROJECT_KEY != ''
+        uses: SonarSource/sonarqube-scan-action@v7
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }}
+            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
+
       - name: Publicar reportes de cobertura
         if: always()
         uses: actions/upload-artifact@v4
@@ -52,5 +72,27 @@ jobs:
           name: cobertura
           path: |
             coverage.json
+            coverage.xml
             htmlcov/
           if-no-files-found: warn
+
+  docker:
+    name: Construcción y pruebas en Docker
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ejecutar la suite en la imagen de pruebas
+        run: |
+          docker build --target pruebas -t sigen:pruebas .
+          docker run --rm sigen:pruebas
+
+      - name: Verificar la imagen de aplicación
+        run: |
+          docker build -t sigen:ci .
+          docker run --rm -d --name sigen-ci -p 127.0.0.1:8765:8000 sigen:ci
+          trap 'docker stop sigen-ci' EXIT
+          curl --fail --silent --show-error --retry 15 --retry-connrefused --retry-delay 1 http://127.0.0.1:8765/health
+          curl --fail --silent --show-error --output /dev/null http://127.0.0.1:8765/
+          curl --fail --silent --show-error --output /dev/null http://127.0.0.1:8765/static/app.js

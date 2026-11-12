@@ -1,9 +1,11 @@
 """Adaptador HTTP con decodificación decimal y errores públicos estables."""
 
 import json
+import logging
 from dataclasses import asdict
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
+from time import perf_counter
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse
@@ -13,6 +15,8 @@ from sigen.calculator import calcular_resultado
 from sigen.config import DIRECTORIO_WEB, RUTA_CALCULO, RUTA_ESTATICOS, RUTA_SALUD
 from sigen.domain import DatosInvalidos, ErrorCampo, PonderacionInvalida
 from sigen.schemas import ENTRADA_SCHEMA, ERROR_SCHEMA, RESULTADO_SCHEMA
+
+REGISTRO_HTTP = logging.getLogger("uvicorn.error")
 
 
 def _rechazar_constante(valor: str) -> None:
@@ -38,6 +42,27 @@ def crear_app(directorio_web: Path = DIRECTORIO_WEB) -> FastAPI:
         version="0.1.0",
         description="Simulador académico. Redondeo HALF_UP asumido por el prototipo.",
     )
+
+    @aplicacion.middleware("http")
+    async def medir_solicitud(request: Request, call_next):
+        inicio = perf_counter()
+        estado = 500
+        try:
+            respuesta = await call_next(request)
+            estado = respuesta.status_code
+            duracion_ms = (perf_counter() - inicio) * 1000
+            respuesta.headers["Server-Timing"] = f"app;dur={duracion_ms:.2f}"
+            return respuesta
+        finally:
+            ruta = getattr(request.scope.get("route"), "path", "sin_ruta")
+            REGISTRO_HTTP.log(
+                logging.ERROR if estado >= 500 else logging.INFO,
+                "%s %s estado=%d duracion_ms=%.2f",
+                request.method,
+                ruta,
+                estado,
+                (perf_counter() - inicio) * 1000,
+            )
 
     @aplicacion.exception_handler(DatosInvalidos)
     async def error_datos(request: Request, error: DatosInvalidos) -> JSONResponse:

@@ -8,21 +8,36 @@ el mismo contrato se comprueba contra el proceso real.
 
 import os
 
-import httpx2
 import pytest
+import requests
 from fastapi.testclient import TestClient
 
 from sigen.api import app
 
 VARIABLE_URL_BASE = "SIGEN_URL_BASE"
+TIEMPO_MAXIMO = 10
+
+
+class ClienteRequests:
+    def __init__(self, sesion: requests.Session, url_base: str):
+        self.sesion = sesion
+        self.url_base = url_base.rstrip("/")
+
+    def get(self, ruta: str):
+        return self.sesion.get(f"{self.url_base}{ruta}", timeout=TIEMPO_MAXIMO)
+
+    def post(self, ruta: str, *, content=None, **opciones):
+        return self.sesion.post(
+            f"{self.url_base}{ruta}", data=content, timeout=TIEMPO_MAXIMO, **opciones
+        )
 
 
 @pytest.fixture(scope="session")
 def cliente():
     url_base = os.environ.get(VARIABLE_URL_BASE)
     if url_base:
-        with httpx2.Client(base_url=url_base, timeout=10) as remoto:
-            yield remoto
+        with requests.Session() as sesion:
+            yield ClienteRequests(sesion, url_base)
     else:
         with TestClient(app) as local:
             yield local

@@ -135,7 +135,7 @@ Los 7 fallos (5 de cálculo, 2 de salud) fueron respuestas **HTTP 0** (sin respu
 
 ## 7. Limitaciones
 
-- La CI remota se ejecutó en la rama `stefven/calidad`; la integración en `main` sigue pendiente de PR.
+- Los resultados anteriores corresponden a la medición histórica en `stefven/calidad`. La configuración de CI está integrada en `main`.
 - Mediciones en Windows con generador y servidor en el mismo equipo; no comparables con otro hardware.
-- `sigen.config.DIRECTORIO_WEB` resuelve `web/` relativo al código fuente: funciona con la instalación editable (`pip install -e .`) indicada; una instalación no editable no incluiría la interfaz. Reportado a Jose como observación, no como defecto del contrato.
-- Docker y RF-09 fuera del alcance inicial; revisar la rúbrica antes de asumir que lo opcional basta.
+- La interfaz se empaqueta junto a `sigen`. Consultar el [cierre de revisión](revision_despliegue.md).
+- La medición de carga precede al empaquetado con Docker y al registro de tiempos. La tabla refleja el entorno indicado.

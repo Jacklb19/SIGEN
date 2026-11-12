@@ -89,8 +89,8 @@ Al verificar multipleOf=0.1 con una biblioteca que utiliza floats binarios, deco
 
 ## Interfaz y estáticos
 
-- `/` sirve `web/index.html` cuando exista. Mientras falta, devuelve 404; no se fabrica una interfaz provisional.
-- `/static` sirve `web/` si el directorio existe al crear la aplicación. Reiniciar el servidor al añadirlo por primera vez.
+- `/` sirve `src/sigen/web/index.html`.
+- `/static` expone los recursos de la interfaz incluidos en el paquete.
 - El montaje no intercepta `/health`, `/api/v1/calcular` ni `/docs`.
 - Santiago usa URLs relativas del mismo origen. La aplicación no necesita CORS para esa arquitectura.
 

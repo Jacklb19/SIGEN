@@ -14,11 +14,12 @@ Es un simulador con datos ficticios, sin cuentas, base de datos ni integración 
 | Interfaz web (`/`) | Implementada con maqueta aprobada | Santiago |
 | Paquete instalable y dependencias fijadas | Implementado | Stefven |
 | Pruebas independientes de contrato (118) | Implementadas y aprobadas localmente | Stefven |
-| Puerta de calidad (líneas ≥ 80 %, ramas informadas) | Implementada: 255 pruebas, líneas 203/203, ramas 50/50 | Stefven |
+| Puerta de calidad (líneas ≥ 80 %, ramas informadas) | 255 pruebas Python y 3 regresiones de interfaz | Equipo |
 | Ruff y Bandit | Sin hallazgos en la puerta; hallazgos ampliados registrados | Stefven |
 | Carga con Locust (10/20/50 usuarios) | Medida localmente | Stefven |
-| GitHub Actions | Ejecución remota **exitosa** en la rama `stefven/calidad` ([run](https://github.com/Jacklb19/SIGEN/actions/runs/42962657637)) | Stefven |
-| Docker y RF-09 (nota necesaria) | Fuera del primer alcance | — |
+| GitHub Actions | Python 3.12, regresiones de interfaz y verificación de Docker | Equipo |
+| Docker | Imagen de aplicación y etapa de pruebas | Equipo |
+| SonarQube Cloud | Configuración en CI, activación con credenciales del proyecto | Jose |
 
 ## Documentación
 
@@ -31,17 +32,19 @@ Es un simulador con datos ficticios, sin cuentas, base de datos ni integración 
 - [Reporte de calidad: cobertura, análisis estático, CI y carga](docs/reporte_calidad.md)
 - [Mantenimiento correctivo y regresión](docs/mantenimiento.md)
 - [Evidencias](docs/evidencias/)
+- [Guion de sustentación y lista de entrega](docs/sustentacion.md)
+- [Despliegue en Vercel](docs/despliegue_vercel.md)
 
 ## Tecnologías
 
-Python 3.11, FastAPI, Uvicorn, Pydantic, Pytest, pytest-cov, httpx2, jsonschema, Ruff, Bandit, Locust y GitHub Actions. HTML, CSS y JavaScript sin frameworks para la interfaz. Versiones exactas en `requirements.txt` y `requirements-dev.txt`.
+Python 3.12, FastAPI, Uvicorn, Pydantic, Pytest, pytest-cov, Requests, httpx2, JSON Schema, Ruff, Bandit, Locust, Docker y GitHub Actions. La interfaz usa HTML, CSS y JavaScript. Node.js ejecuta sus pruebas de regresión. Versiones de Python y dependencias en `.python-version` y `requirements*.txt`.
 
 ## Instalación (PowerShell, desde la raíz del repositorio)
 
-Requiere Python 3.11.
+Usar Python 3.12, igual que en CI y Vercel.
 
 ```powershell
-py -3.11 -m venv .venv
+py -3.12 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
@@ -50,9 +53,9 @@ python -m pip install --no-deps -e .
 python -m pip check
 ```
 
-Si `py -3.11` no está disponible, crear el entorno con cualquier intérprete 3.11 (por ejemplo, `C:\ruta\python3.11\python.exe -m venv .venv`). La instalación editable es la prevista: el servidor localiza `web/` relativo al código fuente. No hace falta `PYTHONPATH`.
+El paquete incluye los archivos de interfaz en `src/sigen/web/` y funciona con instalación editable o mediante wheel.
 
-En Linux/macOS: `python3.11 -m venv .venv` y `source .venv/bin/activate`; el resto de comandos es igual.
+En Linux y macOS, crear el entorno con `python3.12 -m venv .venv` y activarlo con `source .venv/bin/activate`.
 
 ## Ejecutar la aplicación
 
@@ -73,6 +76,7 @@ python scripts/verificar_calidad.py           # suite completa + cobertura + pue
 python -m ruff check .                        # estilo y posibles defectos
 python -m ruff format --check .               # formato
 python -m bandit -c pyproject.toml -r src -q  # patrones de seguridad en el código productivo
+node --test tests/ui/test_interfaz.cjs        # regresiones del formulario
 ```
 
 `verificar_calidad.py` ejecuta Pytest con cobertura de `sigen` (líneas y ramas, reportes en consola, `htmlcov/` y `coverage.json`), propaga cualquier fallo y exige `covered_lines / num_statements >= 0.80`. Falla si el reporte falta, está mal formado o no tiene sentencias. Las ramas se informan aparte, sin umbral (no hay uno acordado). La CI ejecuta exactamente estos comandos.
@@ -84,13 +88,33 @@ python -m pytest tests/unit tests/api     # pruebas de Jose
 python -m pytest tests/contract           # contrato independiente
 ```
 
-Para comprobar el contrato contra un servidor real ya arrancado:
+Para comprobar el contrato con Requests contra un servidor real ya arrancado:
 
 ```powershell
 $env:SIGEN_URL_BASE = 'http://127.0.0.1:8000'
 python -m pytest tests/contract
 Remove-Item Env:SIGEN_URL_BASE
 ```
+
+## Docker
+
+```powershell
+docker build -t sigen:local .
+docker run --rm -p 127.0.0.1:8000:8000 sigen:local
+```
+
+La aplicación se abre en <http://127.0.0.1:8000/>. Para ejecutar la suite Python dentro del contenedor:
+
+```powershell
+docker build --target pruebas -t sigen:pruebas .
+docker run --rm sigen:pruebas
+```
+
+## SonarQube Cloud y observabilidad
+
+En SonarQube Cloud, importar el repositorio público y elegir análisis por CI. En GitHub, configurar las variables `SONAR_ORGANIZATION` y `SONAR_PROJECT_KEY` y guardar el token como secreto `SONAR_TOKEN`. El paso de análisis se habilita en los pushes a `main` al configurar ambas variables. La puerta genera `coverage.xml` para el análisis. La activación requiere los datos del proyecto en SonarQube Cloud.
+
+En ejecución con Uvicorn, la API registra método, ruta, estado HTTP y tiempo en milisegundos. Las respuestas procesadas incluyen `Server-Timing`.
 
 ## Pruebas de carga
 
@@ -112,9 +136,8 @@ Repetir con `-u 20` y `-u 50`. Sin `--headless`, Locust abre su panel en <http:/
 
 ## Límites conocidos
 
-- La CI remota se comprobó en la rama `stefven/calidad`; falta integrarla en `main` mediante PR coordinado con Jose.
 - Las mediciones de carga son locales, con generador y servidor en el mismo equipo, y no fijan ni prometen un SLO.
-- Docker y RF-09 quedan fuera del primer alcance; confirmar con la rúbrica si son exigibles.
+- RF-09 (nota necesaria) e IaC dependen de la rúbrica del profesor.
 
 ## Equipo
 

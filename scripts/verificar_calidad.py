@@ -36,6 +36,7 @@ COMANDO_PYTEST = [
     "--cov-branch",
     "--cov-report=term-missing",
     "--cov-report=html",
+    "--cov-report=xml:coverage.xml",
     f"--cov-report=json:{REPORTE_JSON.name}",
 ]
 

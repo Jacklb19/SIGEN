@@ -143,7 +143,7 @@ flowchart TD
     T["Pytest / Locust / análisis estático"] --> API
 ```
 
-**Tecnologías:** Python 3.11 como versión común inicial de desarrollo y CI; FastAPI, Uvicorn, Pydantic, Pytest, pytest-cov, httpx, Locust, Ruff, Bandit, Git y GitHub Actions. Fijar versiones compatibles al implementar. SonarQube Cloud es una alternativa o complemento si resulta viable y se autoriza su conexión; Docker es opcional para reproducibilidad, salvo exigencia expresa de la rúbrica.
+**Tecnologías de la entrega:** Python 3.12, FastAPI, Uvicorn, Pydantic, Pytest, pytest-cov, Requests, httpx2, JSON Schema, Locust, Ruff, Bandit, Docker, Git y GitHub Actions. SonarQube Cloud se configura en CI y requiere activar el proyecto. El [README](README.md) recoge los comandos vigentes.
 
 **Árbol de trabajo propuesto:**
 
@@ -410,7 +410,7 @@ python -m bandit -r src -q
 
 **Git:** rama `main`, ramas breves para cambios, commits descriptivos, `.gitignore` para `.venv`, caches, reportes HTML y credenciales. Publicar README con instrucciones.
 
-**GitHub Actions:** una vez exista la implementación, en cada push/PR ejecutar preparación de Python 3.11, instalación de dependencias, Ruff, Bandit y el comando único de suite y cobertura. La CI debe fallar cuando una comprobación o puerta de calidad incumple el criterio. Su configuración forma parte del alcance obligatorio; no confundir un workflow escrito con una ejecución remota comprobada. Docker puede demostrar un ambiente reproducible en una fase complementaria.
+**GitHub Actions:** en cada push o PR se ejecutan las comprobaciones en Python 3.12, Ruff, Bandit, la puerta de cobertura, las regresiones de interfaz y la validación en Docker. SonarQube Cloud se activa para los pushes a main con el proyecto configurado.
 
 **Historia de mantenimiento correctivo para la exposición:**
 
@@ -488,7 +488,7 @@ El modo `--reload` es solo de desarrollo. Para comprobar calidad, una vez implem
 
 **Dependencias sugeridas en `requirements.txt`:** `fastapi`, `uvicorn`, `pydantic`.
 
-**En `requirements-dev.txt`:** `pytest`, `pytest-cov`, `httpx`, `locust`, `ruff`, `bandit`, `jsonschema` (cuando se valide un esquema explícito).
+**En `requirements-dev.txt`:** `pytest`, `pytest-cov`, `requests`, `httpx2`, `locust`, `ruff`, `bandit` y `jsonschema`.
 Fijar versiones compatibles **al iniciar la implementación**, no asumir que cualquier combinación futura funcionará.
 
 ---
@@ -576,7 +576,7 @@ Fijar versiones compatibles **al iniciar la implementación**, no asumir que cua
 | Locust satura el equipo local | Reducir usuarios, documentar hardware y medir sin inventar conclusiones. |
 | Alcance crece demasiado | Priorizar cálculo, API, pruebas, reporte y mantenimiento; dejar cuentas, BD, CD e IaC como extensión. |
 
-**Orden de prioridad:** **obligatorio:** reglas + cálculo + API + interfaz básica + Pytest + BVA + cobertura + Locust + análisis estático + Git + CI. **Complementario:** Docker y RF-09, salvo exigencia de la rúbrica. **Solo si la rúbrica lo exige y se acuerda la ampliación:** CD avanzado, rollback, IaC, notificaciones.
+**Alcance de entrega:** reglas, cálculo, API, interfaz, Pytest, valores límite, cobertura, Locust, análisis estático, Git, CI, Docker y observabilidad básica. SonarQube Cloud requiere activación externa. RF-09, Compose, IaC y notificaciones quedan sujetos a la rúbrica. La publicación, las vistas previas y el rollback se validan cuando exista un proyecto desplegado.
 
 ## 13. Organización del desarrollo paralelo
 

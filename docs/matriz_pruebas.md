@@ -78,7 +78,7 @@ Abreviaturas de ubicación: **U** = `tests/unit/test_calculator.py` (Jose), **A*
 | RNF-04 | La puerta usa líneas, no el combinado; falla sin reporte o con 0 sentencias | `tests/calidad/test_verificar_calidad.py` (18 casos) | Aprobada |
 | RNF-05 / R8 | Carga 10/20/50 usuarios con verificación de cuerpo | `locustfile.py` | Ver [reporte_calidad.md](reporte_calidad.md#6-pruebas-de-carga) |
 
-## Pendiente
+## Regresiones de interfaz
 
-- Integración en `main` mediante PR coordinado con Jose.
-- Pruebas de interfaz: responsabilidad de Santiago, registradas en [pruebas_interfaz.md](pruebas_interfaz.md).
+- Las pruebas manuales de Santiago constan en [pruebas_interfaz.md](pruebas_interfaz.md).
+- `node --test tests/ui/test_interfaz.cjs` verifica el rechazo de precisión oculta, la aceptación de ceros finales y el foco tras errores del servidor.

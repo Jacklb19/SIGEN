@@ -6,16 +6,13 @@ la maqueta aprobada en `docs/maqueta_interfaz.md` y consume la API descrita en
 
 ## Archivos
 
-- `web/index.html`: estructura semántica de la pantalla única, en español.
-- `web/styles.css`: estilos, diseño adaptable (punto de corte 768 px) y
+- `src/sigen/web/index.html`: estructura semántica de la pantalla única, en español.
+- `src/sigen/web/styles.css`: estilos, diseño adaptable (punto de corte 768 px) y
   estados visuales (error, éxito, desactualizado, carga).
-- `web/app.js`: validación de entradas, consumo de la API y representación de
+- `src/sigen/web/app.js`: validación de entradas, consumo de la API y representación de
   resultados y errores. Sin dependencias ni framework.
 
-El backend los sirve en el mismo origen: `/` entrega `web/index.html` y
-`/static` expone los recursos (montaje implementado por Jose en
-`src/sigen/api.py`). Al crear `web/` por primera vez hay que reiniciar el
-servidor para que `/static` se registre.
+El backend sirve `index.html` en `/` y expone los recursos empaquetados bajo `/static`.
 
 ## Pantalla
 
@@ -41,8 +38,9 @@ límites del contrato (nota 0–5 en pasos de 0.1, peso entero 0–100, nombre
 ## Validación de entradas y alcance
 
 - Un campo vacío nunca se convierte en cero: se reporta como obligatorio.
-- La nota exige formato numérico decimal, rango 0–5 y múltiplos de 0.1; se
-  exige aunque el peso sea 0.
+- La nota exige formato decimal, rango 0–5 y múltiplos de 0.1. La precisión se
+  valida antes de convertir el texto y se admiten ceros finales. También se
+  requiere la nota cuando el peso es cero.
 - El peso exige dígitos enteros (se rechazan `30.0`, decimales y notación
   exponencial) en rango 0–100.
 - El nombre se recorta en los extremos y exige 1–80 caracteres.
@@ -59,7 +57,7 @@ límites del contrato (nota 0–5 en pasos de 0.1, peso entero 0–100, nombre
 - **422 VALIDACION**: cada entrada de `error.campos` se ubica por su ruta
   (`actividades.<índice>.<campo>`, índice desde cero) bajo el campo
   correspondiente, con `aria-invalid` y `aria-describedby`; el foco se mueve al
-  primer campo con error. Rutas no reconocibles (p. ej. `body`) se listan en el
+  primer campo con error después de habilitarlo. Rutas no reconocibles (p. ej. `body`) se listan en el
   resumen general. No se depende del orden ni del texto literal.
 - **400 PONDERACION_INVALIDA**: el mensaje de la ruta `actividades.pesos` se
   muestra junto al total de pesos, además del resumen general.
@@ -86,10 +84,9 @@ límites del contrato (nota 0–5 en pasos de 0.1, peso entero 0–100, nombre
 Con el entorno del proyecto (ver `docs/backend.md`):
 
 ```powershell
-.\.venv\Scripts\python.exe -m uvicorn sigen.api:app --app-dir src
+python -m uvicorn sigen.api:app
 ```
 
-Abrir `http://localhost:8000/`. Si `web/` se creó después de arrancar el
-servidor, reiniciarlo para registrar `/static`.
+Abrir `http://localhost:8000/`.
 
 Las verificaciones realizadas se registran en `docs/pruebas_interfaz.md`.
