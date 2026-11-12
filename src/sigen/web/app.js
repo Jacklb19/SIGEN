@@ -52,6 +52,7 @@ const resumenErrores = document.getElementById("resumen-errores");
 const resumenTexto = document.getElementById("resumen-errores-texto");
 const resumenLista = document.getElementById("resumen-errores-lista");
 const totalPesos = document.getElementById("total-pesos");
+const medidorPesos = document.getElementById("medidor-pesos");
 const errorPesos = document.getElementById("error-pesos");
 const botonCalcular = document.getElementById("boton-calcular");
 const botonRestablecer = document.getElementById("boton-restablecer");
@@ -136,7 +137,17 @@ function actualizarTotalPesos() {
       suma += Number.parseInt(crudo, 10);
     }
   }
-  totalPesos.textContent = `${suma} / ${CONFIG.limites.totalPesos}`;
+  const total = CONFIG.limites.totalPesos;
+  totalPesos.textContent = `${suma} / ${total}`;
+  /* Barra solo informativa: la suma la sigue validando el servidor. */
+  medidorPesos.value = Math.min(suma, total);
+  let estado = "incompleto";
+  if (suma === total) {
+    estado = "completo";
+  } else if (suma > total) {
+    estado = "excedido";
+  }
+  medidorPesos.setAttribute("data-estado", estado);
 }
 
 /* ---------- Validación de entradas (el servidor sigue siendo la autoridad) ---------- */

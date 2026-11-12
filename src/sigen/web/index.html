@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
   <title>SIGEN Lite — Simulador de definitiva académica</title>
   <meta name="description" content="Simulador de definitiva académica de SIGEN Lite: calcula el promedio ponderado y el estado de aprobación de tres actividades.">
   <link rel="stylesheet" href="/static/styles.css">
@@ -88,9 +89,12 @@
         </fieldset>
       </div>
 
-      <p class="total-pesos">
-        Total de pesos: <strong id="total-pesos">0 / 100</strong>
-      </p>
+      <div class="total-pesos">
+        <p class="total-pesos-texto">
+          Total de pesos <strong id="total-pesos">0 / 100</strong>
+        </p>
+        <progress id="medidor-pesos" class="medidor-pesos" max="100" value="0" aria-hidden="true"></progress>
+      </div>
       <p class="error-campo error-pesos" id="error-pesos" hidden></p>
 
       <div class="acciones">
@@ -105,17 +109,17 @@
         Resultado anterior: los datos cambiaron desde este cálculo.
       </p>
       <dl class="resultado-datos">
-        <div class="resultado-item">
-          <dt>Promedio ponderado</dt>
-          <dd id="resultado-promedio">—</dd>
-        </div>
-        <div class="resultado-item">
+        <div class="resultado-item resultado-principal">
           <dt>Definitiva</dt>
           <dd id="resultado-definitiva">—</dd>
         </div>
         <div class="resultado-item">
           <dt>Estado</dt>
           <dd id="resultado-estado" class="estado">—</dd>
+        </div>
+        <div class="resultado-item">
+          <dt>Promedio ponderado</dt>
+          <dd id="resultado-promedio">—</dd>
         </div>
       </dl>
       <p class="nota-redondeo">
