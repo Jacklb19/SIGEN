@@ -16,13 +16,21 @@ El backend sirve `index.html` en `/` y expone los recursos empaquetados bajo `/s
 
 ## Pantalla
 
-La rama `mejoras/interfaz-simulacion` añade materia opcional, indicador de pesos, tres a cinco actividades y escalas de 0 a 5 o de 0 a 10. El selector ofrece diez semestres. Cada uno conserva su propio formulario mientras la página está abierta y permite calcular su definitiva por separado. Al volver a un semestre, se restauran sus datos para recalcular.
+El simulador incluye materia opcional, indicador de pesos, tres a cinco actividades y escalas de 0 a 5 o de 0 a 10. El selector ofrece diez semestres. Cada uno conserva su propio formulario mientras la página está abierta y permite calcular su definitiva por separado. Al volver a un semestre, se restauran sus datos para recalcular.
 
 Al agregar o quitar una actividad, ajusta los pesos hasta sumar 100. Cambiar la escala conserva las notas escritas y aplica el nuevo rango cuando calculas. **Restablecer** devuelve el semestre activo a sus valores iniciales. La interfaz usa v1 para el caso clásico de tres actividades sobre 5 y v2 para los demás. La materia y el semestre quedan como datos de presentación.
 
 - Tres actividades con nombre, nota y peso. Valores iniciales: Parcial 1
   (3.5, 30), Parcial 2 (2.5, 30) y Proyecto (4.0, 40).
-- Total de pesos visible, recalculado al editar; es solo informativo.
+- Total de pesos visible, recalculado al editar; es solo informativo. Lo
+  acompaña una barra que se llena hasta 100 y cambia de tono cuando la suma
+  es exactamente 100 o la supera. El formulario y el servidor validan la suma.
+- Tema visual de planilla de notas: títulos con serifa, números tabulares
+  alineados a la derecha en escritorio y la definitiva como dato principal
+  del resultado. Usa solo fuentes del sistema, sin recursos externos.
+- Modo claro y oscuro automáticos según la preferencia del sistema
+  (`prefers-color-scheme`). Las animaciones se desactivan con
+  `prefers-reduced-motion`.
 - Botones Calcular definitiva y Restablecer.
 - Resultado con promedio ponderado, definitiva con exactamente un decimal y
   estado APROBADO/REPROBADO, más la aclaración de que el redondeo es una
@@ -73,10 +81,10 @@ límites del contrato (nota 0–5 en pasos de 0.1, peso entero 0–100, nombre
 ## Estados de la interacción
 
 - Durante el cálculo los campos y botones se deshabilitan y el botón indica
-  "Calculando…" con `aria-busy`; los controles se restauran en éxito y en
-  fallo, y se evitan envíos duplicados.
+  "Calculando…" con `aria-busy` y un indicador giratorio. Los controles se
+  restauran tanto si la solicitud tiene éxito como si falla.
 - Si los datos cambian después de un cálculo, el resultado se marca como
-  desactualizado (borde punteado, menor énfasis y aviso en texto) hasta el
+  desactualizado (borde punteado y aviso en texto) hasta el
   próximo cálculo exitoso.
 - Restablecer limpia errores y resultado, repone los valores iniciales y
   devuelve el foco al primer campo.
