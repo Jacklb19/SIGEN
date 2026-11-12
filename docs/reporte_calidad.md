@@ -79,6 +79,12 @@ Además de la puerta, se ejecutó una exploración ampliada con reglas `N` (nomb
 | Comandos verificados localmente | **Sí** (Windows, mismos comandos y locks; YAML validado sintácticamente) |
 | Ejecución remota comprobada | **Sí.** Push autorizado de `stefven/calidad` el 11-nov-2026; workflow `CI` sobre el commit `9d9a095`, conclusión `success` ([run](https://github.com/Jacklb19/SIGEN/actions/runs/42962657637)). |
 
+### Aviso en Telegram
+
+El job `aviso-telegram` corre tras `calidad` y `docker` en cada push a cualquier rama, haya éxito o fallo, y envía al chat configurado el resultado de cada job, la rama, quién hizo el push, el commit, su autor y el enlace a la ejecución. Solo avisa en las ramas cuyo `ci.yml` ya incluye este job: una rama creada antes del cambio empieza a avisar cuando se actualiza desde `main`. Requiere dos secretos del repositorio (Settings → Secrets and variables → Actions): `TELEGRAM_BOT_TOKEN`, el token que entrega @BotFather, y `TELEGRAM_CHAT_ID`, el identificador del chat o grupo donde se agregó el bot. Sin ellos, el paso informa que se omite y termina sin error. Si Telegram no responde, el paso deja una advertencia y no cambia el resultado de la CI. Los datos del commit se pasan como variables de entorno, no interpolados en el script, para evitar inyección de comandos.
+
+Comprobación local (12-nov-2026), sin enviar mensajes reales y con `curl` simulado: YAML válido; sin secretos se omite; con CI en verde y en rojo el texto es correcto; un mensaje de commit con `$(...)` y comillas invertidas no ejecutó comandos.
+
 ## 6. Pruebas de carga
 
 ### Configuración

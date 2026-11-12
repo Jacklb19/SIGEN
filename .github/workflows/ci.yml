@@ -96,3 +96,55 @@ jobs:
           curl --fail --silent --show-error --max-time 3 --retry 15 --retry-all-errors --retry-delay 1 http://127.0.0.1:8765/health
           curl --fail --silent --show-error --output /dev/null http://127.0.0.1:8765/
           curl --fail --silent --show-error --output /dev/null http://127.0.0.1:8765/static/app.js
+
+  aviso-telegram:
+    name: Aviso en Telegram
+    needs: [calidad, docker]
+    if: always() && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Enviar el resultado de la CI
+        # Los datos del commit llegan por variables de entorno, nunca interpolados
+        # en el script, para que un mensaje de commit no pueda inyectar comandos.
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          RESULTADO_CALIDAD: ${{ needs.calidad.result }}
+          RESULTADO_DOCKER: ${{ needs.docker.result }}
+          MENSAJE_COMMIT: ${{ github.event.head_commit.message }}
+          AUTOR: ${{ github.event.head_commit.author.name }}
+          QUIEN_HIZO_PUSH: ${{ github.actor }}
+          RAMA: ${{ github.ref_name }}
+          SHA: ${{ github.sha }}
+          URL_EJECUCION: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
+            echo "Faltan los secretos TELEGRAM_BOT_TOKEN o TELEGRAM_CHAT_ID: no se envía el aviso."
+            exit 0
+          fi
+          estado() {
+            case "$1" in
+              success) echo "OK" ;;
+              failure) echo "FALLO" ;;
+              cancelled) echo "CANCELADO" ;;
+              *) echo "OMITIDO" ;;
+            esac
+          }
+          if [ "$RESULTADO_CALIDAD" = "success" ] && [ "$RESULTADO_DOCKER" = "success" ]; then
+            titulo="SIGEN Lite: CI en verde en ${RAMA}"
+          else
+            titulo="SIGEN Lite: CI en rojo en ${RAMA}"
+          fi
+          primera_linea="${MENSAJE_COMMIT%%$'\n'*}"
+          texto="$(printf '%s\n\nCalidad (pruebas, cobertura, Ruff, Bandit, interfaz): %s\nDocker (suite e imagen): %s\n\nPush de %s a la rama %s\nCommit %s de %s\n%s\n\n%s' \
+            "$titulo" "$(estado "$RESULTADO_CALIDAD")" "$(estado "$RESULTADO_DOCKER")" \
+            "$QUIEN_HIZO_PUSH" "$RAMA" "${SHA:0:7}" "$AUTOR" "$primera_linea" "$URL_EJECUCION")"
+          # Un fallo de Telegram no debe poner en rojo una CI que pasó.
+          if ! curl --silent --show-error --fail --max-time 15 --output /dev/null \
+              "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+              --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
+              --data-urlencode "text=${texto}" \
+              --data "disable_web_page_preview=true"; then
+            echo "::warning::No se pudo enviar el aviso a Telegram."
+          fi
