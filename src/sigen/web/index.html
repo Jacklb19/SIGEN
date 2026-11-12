@@ -21,6 +21,11 @@
     </div>
 
     <form id="formulario" novalidate>
+      <div class="campo campo-materia">
+        <label for="materia">Materia <span class="opcional">(opcional)</span></label>
+        <input id="materia" type="text" maxlength="80" autocomplete="off" placeholder="Ej. Pruebas y Mantenimiento">
+      </div>
+
       <h2 class="titulo-seccion">Actividades</h2>
 
       <div class="rejilla-actividades" role="group" aria-label="Actividades de la nota definitiva">
@@ -88,9 +93,13 @@
         </fieldset>
       </div>
 
-      <p class="total-pesos">
-        Total de pesos: <strong id="total-pesos">0 / 100</strong>
-      </p>
+      <div class="ponderacion" id="ponderacion" role="status" aria-atomic="true">
+        <p class="total-pesos">
+          Total de pesos <strong id="total-pesos">0 / 100</strong>
+        </p>
+        <progress id="progreso-pesos" value="0" max="100" aria-label="Peso acumulado"></progress>
+        <p class="mensaje-ponderacion" id="mensaje-ponderacion"></p>
+      </div>
       <p class="error-campo error-pesos" id="error-pesos" hidden></p>
 
       <div class="acciones">
@@ -101,17 +110,18 @@
 
     <section id="resultado" class="resultado" aria-live="polite" hidden>
       <h2 class="titulo-seccion">Resultado</h2>
+      <p class="resultado-materia" id="resultado-materia" hidden></p>
       <p id="aviso-desactualizado" class="aviso-desactualizado" hidden>
         Resultado anterior: los datos cambiaron desde este cálculo.
       </p>
       <dl class="resultado-datos">
+        <div class="resultado-item resultado-item-definitiva">
+          <dt>Definitiva</dt>
+          <dd id="resultado-definitiva">—</dd>
+        </div>
         <div class="resultado-item">
           <dt>Promedio ponderado</dt>
           <dd id="resultado-promedio">—</dd>
-        </div>
-        <div class="resultado-item">
-          <dt>Definitiva</dt>
-          <dd id="resultado-definitiva">—</dd>
         </div>
         <div class="resultado-item">
           <dt>Estado</dt>

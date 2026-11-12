@@ -16,6 +16,8 @@ El backend sirve `index.html` en `/` y expone los recursos empaquetados bajo `/s
 
 ## Pantalla
 
+La rama `mejoras/interfaz-simulacion` añade el nombre opcional de la materia, una barra que indica cuánto falta o sobra para llegar al 100 % y un resultado que destaca la definitiva. El nombre de la materia se muestra en el resultado y se limpia con **Restablecer**. El JSON conserva únicamente las tres actividades.
+
 - Tres actividades con nombre, nota y peso. Valores iniciales: Parcial 1
   (3.5, 30), Parcial 2 (2.5, 30) y Proyecto (4.0, 40).
 - Total de pesos visible, recalculado al editar; es solo informativo.

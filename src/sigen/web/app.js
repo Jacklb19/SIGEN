@@ -52,6 +52,11 @@ const resumenErrores = document.getElementById("resumen-errores");
 const resumenTexto = document.getElementById("resumen-errores-texto");
 const resumenLista = document.getElementById("resumen-errores-lista");
 const totalPesos = document.getElementById("total-pesos");
+const ponderacion = document.getElementById("ponderacion");
+const progresoPesos = document.getElementById("progreso-pesos");
+const mensajePonderacion = document.getElementById("mensaje-ponderacion");
+const materia = document.getElementById("materia");
+const resultadoMateria = document.getElementById("resultado-materia");
 const errorPesos = document.getElementById("error-pesos");
 const botonCalcular = document.getElementById("boton-calcular");
 const botonRestablecer = document.getElementById("boton-restablecer");
@@ -129,14 +134,34 @@ function marcarResultadoDesactualizado() {
 }
 
 function actualizarTotalPesos() {
+  const objetivo = CONFIG.limites.totalPesos;
   let suma = 0;
   for (let indice = 0; indice < CONFIG.valoresIniciales.length; indice += 1) {
-    const crudo = entrada(indice, "peso").value.trim();
-    if (/^\d+$/.test(crudo)) {
-      suma += Number.parseInt(crudo, 10);
+    const peso = validarPeso(entrada(indice, "peso").value);
+    if (peso.error) {
+      totalPesos.textContent = `— / ${objetivo}`;
+      progresoPesos.value = 0;
+      ponderacion.classList.remove("completa", "excedida");
+      mensajePonderacion.textContent = "Completa los tres pesos con valores válidos.";
+      return;
     }
+    suma += peso.valor;
   }
-  totalPesos.textContent = `${suma} / ${CONFIG.limites.totalPesos}`;
+  const diferencia = objetivo - suma;
+  totalPesos.textContent = `${suma} / ${objetivo}`;
+  progresoPesos.value = Math.min(suma, objetivo);
+  ponderacion.classList.toggle("completa", diferencia === 0);
+  ponderacion.classList.toggle("excedida", diferencia < 0);
+
+  if (diferencia === 0) {
+    mensajePonderacion.textContent = "Pesos completos.";
+    return;
+  }
+  const cantidad = Math.abs(diferencia);
+  const verbo = diferencia > 0
+    ? (cantidad === 1 ? "Falta" : "Faltan")
+    : (cantidad === 1 ? "Sobra" : "Sobran");
+  mensajePonderacion.textContent = `${verbo} ${cantidad} ${cantidad === 1 ? "punto" : "puntos"} de peso.`;
 }
 
 /* ---------- Validación de entradas (el servidor sigue siendo la autoridad) ---------- */
@@ -223,7 +248,14 @@ function construirCarga() {
 
 /* ---------- Representación del resultado ---------- */
 
+function actualizarMateria() {
+  const nombre = materia.value.trim();
+  resultadoMateria.textContent = nombre;
+  resultadoMateria.hidden = nombre === "";
+}
+
 function mostrarResultado(datos) {
+  actualizarMateria();
   resultadoPromedio.textContent = String(datos.promedio_ponderado);
   resultadoDefinitiva.textContent = Number(datos.nota_definitiva).toFixed(1);
   const aprobado = datos.estado === "APROBADO";
@@ -370,6 +402,8 @@ async function calcular(evento) {
 /* ---------- Restablecer y cambios ---------- */
 
 function restablecer() {
+  materia.value = "";
+  actualizarMateria();
   CONFIG.valoresIniciales.forEach((inicial, indice) => {
     entrada(indice, "nombre").value = inicial.nombre;
     entrada(indice, "nota").value = inicial.nota;
@@ -383,6 +417,10 @@ function restablecer() {
 
 function alEditarCampo(evento) {
   const input = evento.target;
+  if (input === materia) {
+    actualizarMateria();
+    return;
+  }
   if (!(input instanceof HTMLInputElement)) {
     return;
   }
