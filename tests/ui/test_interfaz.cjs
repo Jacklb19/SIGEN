@@ -5,10 +5,7 @@ const test = require("node:test");
 const vm = require("node:vm");
 
 function cargarInterfaz(respuesta) {
-  const directorios = ["../../src/sigen/web", "../../web"];
-  const archivo = directorios
-    .map((directorio) => path.join(__dirname, directorio, "app.js"))
-    .find((candidato) => fs.existsSync(candidato));
+  const archivo = path.join(__dirname, "../../src/sigen/web/app.js");
   const elementos = new Map();
   const peticiones = [];
   const documento = {

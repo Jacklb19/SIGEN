@@ -21,6 +21,7 @@ dev = [
     "pytest-cov>=7.1.0,<8",
     # Starlette 1.10 depreca httpx en TestClient y recomienda httpx2.
     "httpx2>=2.16.0,<3",
+    "requests>=2.34.2,<3",
     "jsonschema>=4.26.0,<5",
     "ruff==0.17.4",
     "bandit>=1.9.4,<2",
@@ -29,6 +30,10 @@ dev = [
 
 [tool.setuptools.packages.find]
 where = ["src"]
+namespaces = false
+
+[tool.setuptools.package-data]
+"sigen.web" = ["*.html", "*.css", "*.js"]
 
 # --- Pytest: única fuente de configuración (no se usa pytest.ini) -----------
 [tool.pytest.ini_options]

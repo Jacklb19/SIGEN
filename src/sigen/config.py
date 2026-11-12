@@ -19,4 +19,4 @@ PRECISION_CALCULO = 28
 RUTA_CALCULO = "/api/v1/calcular"
 RUTA_SALUD = "/health"
 RUTA_ESTATICOS = "/static"
-DIRECTORIO_WEB = Path(__file__).resolve().parents[2] / "web"
+DIRECTORIO_WEB = Path(__file__).resolve().with_name("web")

@@ -18,7 +18,7 @@ const CONFIG = {
     nombreMax: 80,
     notaMin: 0,
     notaMax: 5,
-    pasoNota: 0.1,
+    decimalesNota: 1,
     pesoMin: 0,
     pesoMax: 100,
     totalPesos: 100,
@@ -160,13 +160,13 @@ function validarNota(valorCrudo) {
   if (!/^\d+(\.\d+)?$/.test(valor)) {
     return { error: CONFIG.textos.notaNumero };
   }
+  const fraccion = (valor.split(".")[1] ?? "").replace(/0+$/, "");
+  if (fraccion.length > CONFIG.limites.decimalesNota) {
+    return { error: CONFIG.textos.notaPaso };
+  }
   const numero = Number(valor);
   if (!Number.isFinite(numero) || numero < CONFIG.limites.notaMin || numero > CONFIG.limites.notaMax) {
     return { error: CONFIG.textos.notaRango };
-  }
-  const pasos = numero / CONFIG.limites.pasoNota;
-  if (Math.abs(pasos - Math.round(pasos)) > 1e-9) {
-    return { error: CONFIG.textos.notaPaso };
   }
   return { valor: numero };
 }
@@ -284,11 +284,7 @@ function atenderErrorValidacion(cuerpo) {
   }
 
   mostrarResumen(CONFIG.textos.resumenValidacion, sinUbicar);
-  if (primerCampoConError !== null) {
-    primerCampoConError.focus();
-  } else {
-    resumenErrores.focus?.();
-  }
+  return primerCampoConError ?? resumenErrores;
 }
 
 function atenderPonderacionInvalida(cuerpo) {
@@ -329,6 +325,7 @@ async function calcular(evento) {
   }
 
   establecerCargando(true);
+  let destinoFoco;
   try {
     const respuesta = await fetch(CONFIG.rutaApi, {
       method: "POST",
@@ -350,7 +347,7 @@ async function calcular(evento) {
       mostrarResumen(CONFIG.textos.errorRespuesta, []);
     } else if (respuesta.status === 422) {
       ocultarResultado();
-      atenderErrorValidacion(cuerpo);
+      destinoFoco = atenderErrorValidacion(cuerpo);
     } else if (respuesta.status === 400) {
       ocultarResultado();
       atenderPonderacionInvalida(cuerpo);
@@ -366,6 +363,7 @@ async function calcular(evento) {
     mostrarResumen(CONFIG.textos.errorConexion, []);
   } finally {
     establecerCargando(false);
+    destinoFoco?.focus();
   }
 }
 
