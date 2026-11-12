@@ -1,5 +1,25 @@
 # Contrato inicial de SIGEN Lite
 
+## Extensión en la rama de mejoras
+
+`POST /api/v2/calcular` recibe `actividades` con entre tres y cinco entradas y `escala` como entero JSON de valor `5` o `10`. Los pesos deben sumar 100. La definitiva conserva el redondeo HALF_UP y aprueba desde 3.0 sobre 5 o 6.0 sobre 10. El resultado usa las cuatro claves de v1. Los errores conservan el formato existente y una escala inválida devuelve 422 con `ESCALA_INVALIDA`. Los dos contratos aparecen en `/docs`.
+
+Ejemplo para cuatro actividades sobre 10:
+
+```json
+{
+  "escala": 10,
+  "actividades": [
+    {"nombre": "Parcial 1", "nota": 7, "peso": 25},
+    {"nombre": "Parcial 2", "nota": 8, "peso": 25},
+    {"nombre": "Taller", "nota": 7, "peso": 25},
+    {"nombre": "Proyecto", "nota": 8, "peso": 25}
+  ]
+}
+```
+
+El promedio y la definitiva son 7.5. El estado es `APROBADO`. El contrato v1 que sigue conserva sus límites originales.
+
 Este documento concreta las secciones 2 y 5 de `SIGEN_Lite_Guia_Completa.md`. Implementación del frente de Jose, versión 0.1.0. No implica revisión ya realizada por Santiago o Stefven. Cualquier cambio incompatible debe coordinarse entre los tres.
 
 ## Salud

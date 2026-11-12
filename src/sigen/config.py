@@ -4,6 +4,8 @@ from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 
 NUM_ACTIVIDADES = 3
+MAX_ACTIVIDADES = 5
+ESCALAS_APROBACION = {5: Decimal("3.0"), 10: Decimal("6.0")}
 LONGITUD_NOMBRE_MIN = 1
 LONGITUD_NOMBRE_MAX = 80
 NOTA_MIN = Decimal("0.0")
@@ -17,6 +19,7 @@ REDONDEO = ROUND_HALF_UP
 PRECISION_CALCULO = 28
 
 RUTA_CALCULO = "/api/v1/calcular"
+RUTA_CALCULO_FLEXIBLE = "/api/v2/calcular"
 RUTA_SALUD = "/health"
 RUTA_ESTATICOS = "/static"
 DIRECTORIO_WEB = Path(__file__).resolve().with_name("web")

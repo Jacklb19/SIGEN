@@ -26,12 +26,38 @@
         <input id="materia" type="text" maxlength="80" autocomplete="off" placeholder="Ej. Pruebas y Mantenimiento">
       </div>
 
+      <div class="configuracion-simulacion">
+        <div class="campo">
+          <label for="semestre">Semestre</label>
+          <select id="semestre" aria-describedby="ayuda-semestre">
+            <option value="1">Semestre 1</option>
+            <option value="2">Semestre 2</option>
+            <option value="3">Semestre 3</option>
+            <option value="4">Semestre 4</option>
+            <option value="5">Semestre 5</option>
+            <option value="6">Semestre 6</option>
+            <option value="7">Semestre 7</option>
+            <option value="8">Semestre 8</option>
+            <option value="9">Semestre 9</option>
+            <option value="10">Semestre 10</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label for="escala">Escala de evaluación</label>
+          <select id="escala">
+            <option value="5">0 a 5 · aprueba desde 3.0</option>
+            <option value="10">0 a 10 · aprueba desde 6.0</option>
+          </select>
+        </div>
+      </div>
+      <p class="ayuda-simulacion" id="ayuda-semestre">Cada semestre conserva su formulario mientras la página está abierta. La escala seleccionada se aplica a las notas ingresadas.</p>
+
       <h2 class="titulo-seccion">Actividades</h2>
 
       <div class="rejilla-actividades" role="group" aria-label="Actividades de la nota definitiva">
         <div class="fila-encabezados" aria-hidden="true">
           <span>Actividad</span>
-          <span>Nota (0.0 – 5.0)</span>
+          <span id="encabezado-nota">Nota (0–5)</span>
           <span>Peso (0 – 100)</span>
         </div>
 
@@ -43,7 +69,7 @@
             <p class="error-campo" id="error-nombre-0" hidden></p>
           </div>
           <div class="campo">
-            <label for="nota-0">Nota (0.0 – 5.0)</label>
+            <label for="nota-0" id="etiqueta-nota-0">Nota (0–5)</label>
             <input id="nota-0" data-campo="nota" type="text" inputmode="decimal" autocomplete="off">
             <p class="error-campo" id="error-nota-0" hidden></p>
           </div>
@@ -62,7 +88,7 @@
             <p class="error-campo" id="error-nombre-1" hidden></p>
           </div>
           <div class="campo">
-            <label for="nota-1">Nota (0.0 – 5.0)</label>
+            <label for="nota-1" id="etiqueta-nota-1">Nota (0–5)</label>
             <input id="nota-1" data-campo="nota" type="text" inputmode="decimal" autocomplete="off">
             <p class="error-campo" id="error-nota-1" hidden></p>
           </div>
@@ -81,7 +107,7 @@
             <p class="error-campo" id="error-nombre-2" hidden></p>
           </div>
           <div class="campo">
-            <label for="nota-2">Nota (0.0 – 5.0)</label>
+            <label for="nota-2" id="etiqueta-nota-2">Nota (0–5)</label>
             <input id="nota-2" data-campo="nota" type="text" inputmode="decimal" autocomplete="off">
             <p class="error-campo" id="error-nota-2" hidden></p>
           </div>
@@ -91,6 +117,49 @@
             <p class="error-campo" id="error-peso-2" hidden></p>
           </div>
         </fieldset>
+
+        <fieldset class="actividad" data-indice="3" id="actividad-extra-3" hidden disabled>
+          <legend>Actividad 4</legend>
+          <div class="campo">
+            <label for="nombre-3">Nombre</label>
+            <input id="nombre-3" data-campo="nombre" type="text" autocomplete="off" maxlength="120">
+            <p class="error-campo" id="error-nombre-3" hidden></p>
+          </div>
+          <div class="campo">
+            <label for="nota-3" id="etiqueta-nota-3">Nota (0–5)</label>
+            <input id="nota-3" data-campo="nota" type="text" autocomplete="off" inputmode="decimal">
+            <p class="error-campo" id="error-nota-3" hidden></p>
+          </div>
+          <div class="campo">
+            <label for="peso-3">Peso (0 – 100)</label>
+            <input id="peso-3" data-campo="peso" type="text" autocomplete="off" inputmode="numeric">
+            <p class="error-campo" id="error-peso-3" hidden></p>
+          </div>
+        </fieldset>
+        <fieldset class="actividad" data-indice="4" id="actividad-extra-4" hidden disabled>
+          <legend>Actividad 5</legend>
+          <div class="campo">
+            <label for="nombre-4">Nombre</label>
+            <input id="nombre-4" data-campo="nombre" type="text" autocomplete="off" maxlength="120">
+            <p class="error-campo" id="error-nombre-4" hidden></p>
+          </div>
+          <div class="campo">
+            <label for="nota-4" id="etiqueta-nota-4">Nota (0–5)</label>
+            <input id="nota-4" data-campo="nota" type="text" autocomplete="off" inputmode="decimal">
+            <p class="error-campo" id="error-nota-4" hidden></p>
+          </div>
+          <div class="campo">
+            <label for="peso-4">Peso (0 – 100)</label>
+            <input id="peso-4" data-campo="peso" type="text" autocomplete="off" inputmode="numeric">
+            <p class="error-campo" id="error-peso-4" hidden></p>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="controles-actividades">
+        <button type="button" id="agregar-actividad" class="boton boton-secundario">Agregar actividad</button>
+        <button type="button" id="quitar-actividad" class="boton boton-secundario" disabled>Quitar última</button>
+        <span id="cantidad-actividades" role="status">3 de 5 actividades</span>
       </div>
 
       <div class="ponderacion" id="ponderacion" role="status" aria-atomic="true">
@@ -111,6 +180,7 @@
     <section id="resultado" class="resultado" aria-live="polite" hidden>
       <h2 class="titulo-seccion">Resultado</h2>
       <p class="resultado-materia" id="resultado-materia" hidden></p>
+      <p class="resultado-materia" id="resultado-contexto"></p>
       <p id="aviso-desactualizado" class="aviso-desactualizado" hidden>
         Resultado anterior: los datos cambiaron desde este cálculo.
       </p>

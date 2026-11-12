@@ -8,6 +8,9 @@
    del contrato y textos de presentación. */
 const CONFIG = {
   rutaApi: "/api/v1/calcular",
+  rutaFlexible: "/api/v2/calcular",
+  maxActividades: 5,
+  escalaInicial: 5,
   valoresIniciales: [
     { nombre: "Parcial 1", nota: "3.5", peso: "30" },
     { nombre: "Parcial 2", nota: "2.5", peso: "30" },
@@ -17,7 +20,6 @@ const CONFIG = {
     nombreMin: 1,
     nombreMax: 80,
     notaMin: 0,
-    notaMax: 5,
     decimalesNota: 1,
     pesoMin: 0,
     pesoMax: 100,
@@ -35,7 +37,6 @@ const CONFIG = {
     nombreLongitud: "El nombre debe tener entre 1 y 80 caracteres.",
     notaRequerida: "La nota es obligatoria, incluso si el peso es 0.",
     notaNumero: "La nota debe ser un número, por ejemplo 3.5.",
-    notaRango: "La nota debe estar entre 0.0 y 5.0.",
     notaPaso: "La nota debe avanzar en incrementos de 0.1.",
     pesoRequerido: "El peso es obligatorio.",
     pesoEntero: "El peso debe ser un número entero, por ejemplo 30.",
@@ -65,8 +66,17 @@ const avisoDesactualizado = document.getElementById("aviso-desactualizado");
 const resultadoPromedio = document.getElementById("resultado-promedio");
 const resultadoDefinitiva = document.getElementById("resultado-definitiva");
 const resultadoEstado = document.getElementById("resultado-estado");
+const semestre = document.getElementById("semestre");
+const escala = document.getElementById("escala");
+const agregarActividad = document.getElementById("agregar-actividad");
+const quitarActividad = document.getElementById("quitar-actividad");
+const contadorActividades = document.getElementById("cantidad-actividades");
+const resultadoContexto = document.getElementById("resultado-contexto");
 
 let calculoEnCurso = false;
+let semestreActual = "1";
+let cantidadActividades = CONFIG.valoresIniciales.length;
+const borradores = new Map();
 
 /* ---------- Utilidades de presentación ---------- */
 
@@ -97,7 +107,7 @@ function limpiarErrorCampo(indice, campo) {
 }
 
 function limpiarErrores() {
-  for (let indice = 0; indice < CONFIG.valoresIniciales.length; indice += 1) {
+  for (let indice = 0; indice < cantidadActividades; indice += 1) {
     for (const campo of CAMPOS) {
       limpiarErrorCampo(indice, campo);
     }
@@ -136,13 +146,13 @@ function marcarResultadoDesactualizado() {
 function actualizarTotalPesos() {
   const objetivo = CONFIG.limites.totalPesos;
   let suma = 0;
-  for (let indice = 0; indice < CONFIG.valoresIniciales.length; indice += 1) {
+  for (let indice = 0; indice < cantidadActividades; indice += 1) {
     const peso = validarPeso(entrada(indice, "peso").value);
     if (peso.error) {
       totalPesos.textContent = `— / ${objetivo}`;
       progresoPesos.value = 0;
       ponderacion.classList.remove("completa", "excedida");
-      mensajePonderacion.textContent = "Completa los tres pesos con valores válidos.";
+      mensajePonderacion.textContent = "Completa todos los pesos con valores válidos.";
       return;
     }
     suma += peso.valor;
@@ -190,8 +200,9 @@ function validarNota(valorCrudo) {
     return { error: CONFIG.textos.notaPaso };
   }
   const numero = Number(valor);
-  if (!Number.isFinite(numero) || numero < CONFIG.limites.notaMin || numero > CONFIG.limites.notaMax) {
-    return { error: CONFIG.textos.notaRango };
+  const maximo = Number(escala.value);
+  if (!Number.isFinite(numero) || numero < CONFIG.limites.notaMin || numero > maximo) {
+    return { error: `La nota debe estar entre 0 y ${maximo}.` };
   }
   return { valor: numero };
 }
@@ -221,7 +232,7 @@ function construirCarga() {
   let primerCampoConError = null;
   let hayErrores = false;
 
-  for (let indice = 0; indice < CONFIG.valoresIniciales.length; indice += 1) {
+  for (let indice = 0; indice < cantidadActividades; indice += 1) {
     const actividad = {};
     for (const campo of CAMPOS) {
       const resultado = validadores[campo](entrada(indice, campo).value);
@@ -243,7 +254,10 @@ function construirCarga() {
     primerCampoConError.focus();
     return null;
   }
-  return { actividades };
+  const maximo = Number(escala.value);
+  const flexible = cantidadActividades !== CONFIG.valoresIniciales.length ||
+    maximo !== CONFIG.escalaInicial;
+  return flexible ? { actividades, escala: maximo } : { actividades };
 }
 
 /* ---------- Representación del resultado ---------- */
@@ -256,6 +270,7 @@ function actualizarMateria() {
 
 function mostrarResultado(datos) {
   actualizarMateria();
+  resultadoContexto.textContent = `Semestre ${semestreActual} · Escala de 0 a ${escala.value}`;
   resultadoPromedio.textContent = String(datos.promedio_ponderado);
   resultadoDefinitiva.textContent = Number(datos.nota_definitiva).toFixed(1);
   const aprobado = datos.estado === "APROBADO";
@@ -299,7 +314,7 @@ function atenderErrorValidacion(cuerpo) {
     if (coincidencia) {
       const indice = Number.parseInt(coincidencia[1], 10);
       const campo = coincidencia[2];
-      if (indice >= 0 && indice < CONFIG.valoresIniciales.length) {
+      if (indice >= 0 && indice < cantidadActividades) {
         mostrarErrorCampo(indice, campo, mensaje);
         if (primerCampoConError === null) {
           primerCampoConError = entrada(indice, campo);
@@ -335,11 +350,14 @@ function atenderPonderacionInvalida(cuerpo) {
 
 function establecerCargando(enCurso) {
   calculoEnCurso = enCurso;
+  semestre.disabled = enCurso;
+  escala.disabled = enCurso;
+  actualizarControlesActividades();
   botonCalcular.disabled = enCurso;
   botonRestablecer.disabled = enCurso;
   botonCalcular.textContent = enCurso ? CONFIG.textos.calculando : CONFIG.textos.calcular;
   botonCalcular.setAttribute("aria-busy", enCurso ? "true" : "false");
-  for (let indice = 0; indice < CONFIG.valoresIniciales.length; indice += 1) {
+  for (let indice = 0; indice < cantidadActividades; indice += 1) {
     for (const campo of CAMPOS) {
       entrada(indice, campo).disabled = enCurso;
     }
@@ -359,7 +377,8 @@ async function calcular(evento) {
   establecerCargando(true);
   let destinoFoco;
   try {
-    const respuesta = await fetch(CONFIG.rutaApi, {
+    const ruta = "escala" in carga ? CONFIG.rutaFlexible : CONFIG.rutaApi;
+    const respuesta = await fetch(ruta, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(carga),
@@ -401,17 +420,92 @@ async function calcular(evento) {
 
 /* ---------- Restablecer y cambios ---------- */
 
-function restablecer() {
-  materia.value = "";
-  actualizarMateria();
-  CONFIG.valoresIniciales.forEach((inicial, indice) => {
-    entrada(indice, "nombre").value = inicial.nombre;
-    entrada(indice, "nota").value = inicial.nota;
-    entrada(indice, "peso").value = inicial.peso;
-  });
+function actualizarControlesActividades() {
+  const minimo = CONFIG.valoresIniciales.length;
+  agregarActividad.disabled = calculoEnCurso || cantidadActividades >= CONFIG.maxActividades;
+  quitarActividad.disabled = calculoEnCurso || cantidadActividades <= minimo;
+  contadorActividades.textContent = `${cantidadActividades} de ${CONFIG.maxActividades} actividades`;
+}
+
+function actualizarFilas() {
+  for (let indice = CONFIG.valoresIniciales.length; indice < CONFIG.maxActividades; indice += 1) {
+    const fila = document.getElementById(`actividad-extra-${indice}`);
+    fila.hidden = indice >= cantidadActividades;
+    fila.disabled = fila.hidden;
+  }
+  actualizarControlesActividades();
+}
+
+function actualizarEscala() {
+  const etiqueta = `Nota (0–${escala.value})`;
+  document.getElementById("encabezado-nota").textContent = etiqueta;
+  for (let indice = 0; indice < CONFIG.maxActividades; indice += 1) {
+    document.getElementById(`etiqueta-nota-${indice}`).textContent = etiqueta;
+  }
+}
+
+function actividadVacia(indice) {
+  return { nombre: `Actividad ${indice + 1}`, nota: "", peso: "" };
+}
+
+function guardarBorrador() {
+  const actividades = Array.from({ length: cantidadActividades }, (_, indice) =>
+    Object.fromEntries(CAMPOS.map((campo) => [campo, entrada(indice, campo).value]))
+  );
+  borradores.set(semestreActual, { materia: materia.value, escala: escala.value, actividades });
+}
+
+function valoresDelSemestre() {
+  const actividades = semestreActual === "1"
+    ? CONFIG.valoresIniciales
+    : CONFIG.valoresIniciales.map((_, indice) => actividadVacia(indice));
+  return { materia: "", escala: String(CONFIG.escalaInicial), actividades };
+}
+
+function cargarBorrador(borrador) {
   limpiarErrores();
+  cantidadActividades = borrador.actividades.length;
+  materia.value = borrador.materia;
+  escala.value = borrador.escala;
+  actualizarMateria();
+  borrador.actividades.forEach((actividad, indice) => {
+    for (const campo of CAMPOS) {
+      entrada(indice, campo).value = actividad[campo];
+    }
+  });
+  actualizarFilas();
+  actualizarEscala();
   ocultarResultado();
   actualizarTotalPesos();
+}
+
+function cambiarSemestre() {
+  guardarBorrador();
+  semestreActual = semestre.value;
+  cargarBorrador(borradores.get(semestreActual) ?? valoresDelSemestre());
+}
+
+function cambiarCantidad(delta) {
+  const siguiente = cantidadActividades + delta;
+  if (siguiente < CONFIG.valoresIniciales.length || siguiente > CONFIG.maxActividades) {
+    return;
+  }
+  limpiarErrores();
+  if (delta > 0) {
+    const nueva = actividadVacia(cantidadActividades);
+    for (const campo of CAMPOS) {
+      entrada(cantidadActividades, campo).value = nueva[campo];
+    }
+  }
+  cantidadActividades = siguiente;
+  actualizarFilas();
+  marcarResultadoDesactualizado();
+  actualizarTotalPesos();
+  entrada(cantidadActividades - 1, "nombre").focus();
+}
+
+function restablecer() {
+  cargarBorrador(valoresDelSemestre());
   entrada(0, "nombre").focus();
 }
 
@@ -434,12 +528,16 @@ function alEditarCampo(evento) {
 
 /* ---------- Arranque ---------- */
 
-CONFIG.valoresIniciales.forEach((inicial, indice) => {
-  entrada(indice, "nombre").value = inicial.nombre;
-  entrada(indice, "nota").value = inicial.nota;
-  entrada(indice, "peso").value = inicial.peso;
+semestre.value = semestreActual;
+cargarBorrador(valoresDelSemestre());
+semestre.addEventListener("change", cambiarSemestre);
+escala.addEventListener("change", () => {
+  actualizarEscala();
+  limpiarErrores();
+  marcarResultadoDesactualizado();
 });
-actualizarTotalPesos();
+agregarActividad.addEventListener("click", () => cambiarCantidad(1));
+quitarActividad.addEventListener("click", () => cambiarCantidad(-1));
 formulario.addEventListener("submit", calcular);
 formulario.addEventListener("input", alEditarCampo);
 botonRestablecer.addEventListener("click", restablecer);

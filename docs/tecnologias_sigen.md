@@ -46,3 +46,9 @@ Guía para la sustentación de Pruebas y Mantenimiento de Software. Empieza con 
 3. **¿Cuál es la diferencia entre CI y CD en SIGEN?** CI verifica cambios en GitHub Actions. CD publica una versión mediante la integración de Vercel, cuando está configurada. Enseña el historial de cada servicio como evidencia.
 
 Para ordenar la demostración, consulta el [guion de sustentación](sustentacion.md).
+
+## Cómo explicar la ampliación
+
+La interfaz guarda un borrador en memoria por semestre en [app.js](../src/sigen/web/app.js). En [index.html](../src/sigen/web/index.html) se eligen semestre, escala y actividades. La API añade `POST /api/v2/calcular` en [api.py](../src/sigen/api.py), con los límites en [validators.py](../src/sigen/validators.py) y el umbral por escala en [calculator.py](../src/sigen/calculator.py).
+
+Para mostrar el cambio, selecciona la escala de 0 a 10 y agrega una cuarta actividad. Usa notas 7, 8, 7 y 8 con peso 25 para cada una. Debe dar 7.5 y APROBADO. Cambia de semestre y vuelve para mostrar que cada formulario se conserva durante la sesión. La suite prueba v1 y v2, incluidos el límite de actividades y el caso 5.95 → 6.0 sobre 10. [Pruebas de v2](../tests/api/test_calculo_flexible.py) · [Pruebas de interfaz](../tests/ui/test_interfaz.cjs)

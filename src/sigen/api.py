@@ -11,12 +11,50 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from sigen.calculator import calcular_resultado
-from sigen.config import DIRECTORIO_WEB, RUTA_CALCULO, RUTA_ESTATICOS, RUTA_SALUD
+from sigen.calculator import calcular_resultado, calcular_resultado_flexible
+from sigen.config import (
+    DIRECTORIO_WEB,
+    RUTA_CALCULO,
+    RUTA_CALCULO_FLEXIBLE,
+    RUTA_ESTATICOS,
+    RUTA_SALUD,
+)
 from sigen.domain import DatosInvalidos, ErrorCampo, PonderacionInvalida
-from sigen.schemas import ENTRADA_SCHEMA, ERROR_SCHEMA, RESULTADO_SCHEMA
+from sigen.schemas import (
+    ENTRADA_FLEXIBLE_SCHEMA,
+    ENTRADA_SCHEMA,
+    ERROR_SCHEMA,
+    RESULTADO_FLEXIBLE_SCHEMA,
+    RESULTADO_SCHEMA,
+)
 
 REGISTRO_HTTP = logging.getLogger("uvicorn.error")
+
+
+def _documentar_calculo(entrada, resultado):
+    return {
+        "response_class": JSONResponse,
+        "responses": {
+            200: {"content": {"application/json": {"schema": resultado}}},
+            **{
+                codigo: {
+                    "description": descripcion,
+                    "content": {"application/json": {"schema": ERROR_SCHEMA}},
+                }
+                for codigo, descripcion in (
+                    (400, "Los porcentajes no suman 100."),
+                    (422, "JSON o campos inválidos."),
+                    (500, "Fallo inesperado del servidor."),
+                )
+            },
+        },
+        "openapi_extra": {
+            "requestBody": {
+                "required": True,
+                "content": {"application/json": {"schema": entrada}},
+            }
+        },
+    }
 
 
 def _rechazar_constante(valor: str) -> None:
@@ -88,29 +126,20 @@ def crear_app(directorio_web: Path = DIRECTORIO_WEB) -> FastAPI:
     @aplicacion.post(
         RUTA_CALCULO,
         summary="Calcular la definitiva de tres actividades",
-        response_class=JSONResponse,
-        responses={
-            200: {"content": {"application/json": {"schema": RESULTADO_SCHEMA}}},
-            **{
-                codigo: {
-                    "description": descripcion,
-                    "content": {"application/json": {"schema": ERROR_SCHEMA}},
-                }
-                for codigo, descripcion in (
-                    (400, "Los porcentajes no suman 100."),
-                    (422, "JSON o campos inválidos."),
-                    (500, "Fallo inesperado del servidor."),
-                )
-            },
-        },
-        openapi_extra={
-            "requestBody": {
-                "required": True,
-                "content": {"application/json": {"schema": ENTRADA_SCHEMA}},
-            }
-        },
+        **_documentar_calculo(ENTRADA_SCHEMA, RESULTADO_SCHEMA),
     )
     async def calcular(request: Request) -> JSONResponse:
+        return await resolver_calculo(request, calcular_resultado)
+
+    @aplicacion.post(
+        RUTA_CALCULO_FLEXIBLE,
+        summary="Calcular entre tres y cinco actividades en escala de 5 o 10",
+        **_documentar_calculo(ENTRADA_FLEXIBLE_SCHEMA, RESULTADO_FLEXIBLE_SCHEMA),
+    )
+    async def calcular_flexible(request: Request) -> JSONResponse:
+        return await resolver_calculo(request, calcular_resultado_flexible)
+
+    async def resolver_calculo(request: Request, motor) -> JSONResponse:
         try:
             datos = json.loads(
                 await request.body(),
@@ -126,7 +155,7 @@ def crear_app(directorio_web: Path = DIRECTORIO_WEB) -> FastAPI:
             raise DatosInvalidos(
                 [ErrorCampo("body", "JSON_INVALIDO", "El cuerpo no es JSON válido.")]
             ) from error
-        resultado = calcular_resultado(datos)
+        resultado = motor(datos)
         # El cálculo ya terminó en Decimal. Solo la representación HTTP usa float:
         # las entradas permitidas producen promedios de hasta tres decimales.
         return JSONResponse(

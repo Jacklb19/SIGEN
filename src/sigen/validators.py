@@ -5,6 +5,7 @@ from decimal import Decimal, localcontext
 from sigen.config import (
     LONGITUD_NOMBRE_MAX,
     LONGITUD_NOMBRE_MIN,
+    MAX_ACTIVIDADES,
     NOTA_MAX,
     NOTA_MIN,
     NUM_ACTIVIDADES,
@@ -40,14 +41,16 @@ def validar_nombre(valor: object, ruta: str = "nombre") -> str:
     return nombre
 
 
-def validar_nota(valor: object, ruta: str = "nota") -> Decimal:
+def validar_nota(
+    valor: object, ruta: str = "nota", *, maximo: Decimal = NOTA_MAX
+) -> Decimal:
     # bool hereda de int: la comprobación debe ser exacta.
     # Los floats del JSON ya deben haberse decodificado como Decimal.
     if type(valor) not in (int, Decimal):
         _fallar(ruta, "TIPO", "La nota debe ser un número.")
     nota = Decimal(valor)
-    if not nota.is_finite() or not NOTA_MIN <= nota <= NOTA_MAX:
-        _fallar(ruta, "RANGO", "La nota debe estar entre 0 y 5 y ser finita.")
+    if not nota.is_finite() or not NOTA_MIN <= nota <= maximo:
+        _fallar(ruta, "RANGO", f"La nota debe estar entre 0 y {maximo:g} y ser finita.")
     with localcontext() as contexto:
         contexto.prec = PRECISION_CALCULO
         normalizada = nota.quantize(PASO_NOTA)
@@ -64,8 +67,10 @@ def validar_peso(valor: object, ruta: str = "peso") -> int:
     return valor
 
 
-def validar_pesos(pesos: list[object]) -> tuple[int, ...]:
-    if len(pesos) != NUM_ACTIVIDADES:
+def validar_pesos(
+    pesos: list[object], *, max_actividades: int = NUM_ACTIVIDADES
+) -> tuple[int, ...]:
+    if not NUM_ACTIVIDADES <= len(pesos) <= max_actividades:
         _fallar("actividades", "CANTIDAD", "Se requieren tres actividades.")
     errores: list[ErrorCampo] = []
     validos = []
@@ -98,24 +103,41 @@ def _validar_claves(datos: dict, requeridas: set[str], ruta: str) -> list[ErrorC
     return errores
 
 
-def validar_entrada(datos: object) -> tuple[Actividad, ...]:
+def validar_entrada(
+    datos: object, *, escala: int | None = None
+) -> tuple[Actividad, ...]:
     if not isinstance(datos, dict):
         _fallar("body", "TIPO", "La petición debe ser un objeto JSON.")
-    errores = _validar_claves(datos, {"actividades"}, "")
+    claves = {"actividades"} if escala is None else {"actividades", "escala"}
+    max_actividades = NUM_ACTIVIDADES if escala is None else MAX_ACTIVIDADES
+    maximo = NOTA_MAX if escala is None else Decimal(escala)
+    errores = _validar_claves(datos, claves, "")
     actividades = datos.get("actividades")
     if "actividades" not in datos:
         raise DatosInvalidos(errores)
     if not isinstance(actividades, list):
         errores.append(ErrorCampo("actividades", "TIPO", "Se requiere una lista."))
         raise DatosInvalidos(errores)
-    if len(actividades) != NUM_ACTIVIDADES:
-        errores.append(
-            ErrorCampo("actividades", "CANTIDAD", "Se requieren tres actividades.")
+    if not NUM_ACTIVIDADES <= len(actividades) <= max_actividades:
+        mensaje = (
+            "Se requieren tres actividades."
+            if escala is None
+            else f"Se requieren entre {NUM_ACTIVIDADES} y {max_actividades} "
+            "actividades."
         )
+        errores.append(ErrorCampo("actividades", "CANTIDAD", mensaje))
         raise DatosInvalidos(errores)
 
     validadas = []
-    validadores = {"nombre": validar_nombre, "nota": validar_nota, "peso": validar_peso}
+
+    def validar_nota_en_escala(valor, ruta):
+        return validar_nota(valor, ruta, maximo=maximo)
+
+    validadores = {
+        "nombre": validar_nombre,
+        "nota": validar_nota_en_escala,
+        "peso": validar_peso,
+    }
     for indice, actividad in enumerate(actividades):
         ruta = f"actividades.{indice}"
         if not isinstance(actividad, dict):
@@ -133,5 +155,7 @@ def validar_entrada(datos: object) -> tuple[Actividad, ...]:
             validadas.append(Actividad(**valores))
     if errores:
         raise DatosInvalidos(errores)
-    validar_pesos([actividad.peso for actividad in validadas])
+    validar_pesos(
+        [actividad.peso for actividad in validadas], max_actividades=max_actividades
+    )
     return tuple(validadas)

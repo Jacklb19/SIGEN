@@ -16,7 +16,9 @@ El backend sirve `index.html` en `/` y expone los recursos empaquetados bajo `/s
 
 ## Pantalla
 
-La rama `mejoras/interfaz-simulacion` añade el nombre opcional de la materia, una barra que indica cuánto falta o sobra para llegar al 100 % y un resultado que destaca la definitiva. El nombre de la materia se muestra en el resultado y se limpia con **Restablecer**. El JSON conserva únicamente las tres actividades.
+La rama `mejoras/interfaz-simulacion` añade materia opcional, indicador de pesos, tres a cinco actividades y escalas de 0 a 5 o de 0 a 10. El selector ofrece diez semestres. Cada uno conserva su propio formulario mientras la página está abierta y permite calcular su definitiva por separado. Al volver a un semestre, se restauran sus datos para recalcular.
+
+Al agregar o quitar una actividad, ajusta los pesos hasta sumar 100. Cambiar la escala conserva las notas escritas y aplica el nuevo rango cuando calculas. **Restablecer** devuelve el semestre activo a sus valores iniciales. La interfaz usa v1 para el caso clásico de tres actividades sobre 5 y v2 para los demás. La materia y el semestre quedan como datos de presentación.
 
 - Tres actividades con nombre, nota y peso. Valores iniciales: Parcial 1
   (3.5, 30), Parcial 2 (2.5, 30) y Proyecto (4.0, 40).

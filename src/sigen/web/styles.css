@@ -108,6 +108,10 @@ body {
   gap: 12px;
 }
 
+.actividad[hidden] {
+  display: none;
+}
+
 .actividad legend {
   font-weight: 600;
   padding: 0 6px;
@@ -125,7 +129,8 @@ body {
   font-size: 0.95rem;
 }
 
-.campo input {
+.campo input,
+.campo select {
   width: 100%;
   min-height: 44px;
   padding: 8px 10px;
@@ -136,7 +141,8 @@ body {
   background: var(--color-superficie);
 }
 
-.campo input:focus-visible {
+.campo input:focus-visible,
+.campo select:focus-visible {
   outline: 3px solid var(--color-foco);
   outline-offset: 1px;
   border-color: var(--color-foco);
@@ -168,6 +174,27 @@ body {
 
 .campo-materia {
   margin-bottom: 20px;
+}
+
+.configuracion-simulacion {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 12px;
+}
+
+.ayuda-simulacion {
+  margin: 6px 0 20px;
+  color: var(--color-texto-suave);
+  font-size: 0.9rem;
+}
+
+.controles-actividades {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  color: var(--color-texto-suave);
 }
 
 .opcional {

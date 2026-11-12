@@ -4,9 +4,13 @@ La validación operativa reside en validators. Un esquema no distingue el
 token entero 30 del token decimal 30.0 ni comprueba la suma entre campos.
 """
 
+from copy import deepcopy
+
 from sigen.config import (
+    ESCALAS_APROBACION,
     LONGITUD_NOMBRE_MAX,
     LONGITUD_NOMBRE_MIN,
+    MAX_ACTIVIDADES,
     NOTA_MAX,
     NOTA_MIN,
     NUM_ACTIVIDADES,
@@ -113,3 +117,22 @@ ERROR_SCHEMA = {
         }
     },
 }
+
+
+def _entrada_en_escala(escala: int) -> dict:
+    esquema = deepcopy(ENTRADA_SCHEMA)
+    esquema["required"].append("escala")
+    propiedades = esquema["properties"]
+    propiedades["escala"] = {"type": "integer", "const": escala}
+    actividades = propiedades["actividades"]
+    actividades["maxItems"] = MAX_ACTIVIDADES
+    actividades["items"]["properties"]["nota"]["maximum"] = escala
+    return esquema
+
+
+ENTRADA_FLEXIBLE_SCHEMA = {
+    "oneOf": [_entrada_en_escala(escala) for escala in ESCALAS_APROBACION]
+}
+RESULTADO_FLEXIBLE_SCHEMA = deepcopy(RESULTADO_SCHEMA)
+for campo in ("promedio_ponderado", "nota_definitiva"):
+    RESULTADO_FLEXIBLE_SCHEMA["properties"][campo]["maximum"] = max(ESCALAS_APROBACION)
